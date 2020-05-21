@@ -1,0 +1,32 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: bb0411bb8df6b83e510ec1b863408d596cc7ed241f445e5a28db0e0776f73b7e
+
+name:           cursor-dirforest
+version:        0.0.0.0
+homepage:       https://github.com/NorfairKing/cursor-dirforest#readme
+bug-reports:    https://github.com/NorfairKing/cursor-dirforest/issues
+license:        MIT
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/NorfairKing/cursor-dirforest
+
+library
+  exposed-modules:
+      Cursor.DirForest
+  other-modules:
+      Paths_cursor_dirforest
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , cursor
+    , dirforest
+    , validity
+  default-language: Haskell2010

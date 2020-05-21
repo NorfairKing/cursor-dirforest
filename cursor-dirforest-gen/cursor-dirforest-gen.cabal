@@ -1,0 +1,54 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: bf7a5dee0bce441409a8c5045075d6ddf99c497dbf8a9d10b7cb124652ca8298
+
+name:           cursor-dirforest-gen
+version:        0.0.0.0
+homepage:       https://github.com/NorfairKing/cursor-dirforest#readme
+bug-reports:    https://github.com/NorfairKing/cursor-dirforest/issues
+license:        MIT
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/NorfairKing/cursor-dirforest
+
+library
+  exposed-modules:
+      Cursor.DirForest.Gen
+  other-modules:
+      Paths_cursor_dirforest_gen
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , cursor
+    , cursor-dirforest
+    , dirforest
+    , genvalidity
+    , genvalidity-containers
+    , genvalidity-dirforest
+  default-language: Haskell2010
+
+test-suite cursor-dirforest-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Cursor.DirForestSpec
+      Paths_cursor_dirforest_gen
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      QuickCheck
+    , base >=4.7 && <5
+    , cursor-dirforest
+    , cursor-dirforest-gen
+    , dirforest
+    , genvalidity-hspec
+    , hspec
+  default-language: Haskell2010
