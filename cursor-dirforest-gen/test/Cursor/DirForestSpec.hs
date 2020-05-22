@@ -16,7 +16,10 @@ spec :: Spec
 spec = do
   genValidSpec @(DirForestCursor Int)
   genValidSpec @(DirTreeCursor Int)
-  describe "makeDirForestCursor" $ it "produces valid cursors" $ producesValidsOnValids (makeDirForestCursor @Int)
+  describe "makeDirForestCursor" $ do
+    it "works for an empty dirforest" $ do
+      shouldBeValid $ makeDirForestCursor (DF.empty @Int)
+    it "produces valid cursors" $ producesValidsOnValids (makeDirForestCursor @Int)
   describe "rebuildDirForestCursor" $ it "produces valid dirforests" $ producesValidsOnValids (rebuildDirForestCursor @Int)
   describe "makeDirTreeCursor" $ do
     it "works for a dirtree with an empty dirforest below"
