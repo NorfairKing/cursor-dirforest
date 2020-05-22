@@ -23,7 +23,7 @@ instance (NFData a, Ord a) => NFData (DirForestCursor a)
 
 data DirTreeCursor a
   = DirTreeCursorFile a
-  | DirTreeCursorDir (DirForestCursor a)
+  | DirTreeCursorDir (Maybe (DirForestCursor a)) -- Nothing means an empty dir
   deriving (Show, Eq, Generic)
 
 instance (Validity a, Ord a) => Validity (DirTreeCursor a)
@@ -39,9 +39,9 @@ rebuildDirForestCursor (DirForestCursor mc) = DirForest $ M.fromList $ NE.toList
 makeDirTreeCursor :: DirTree a -> DirTreeCursor a
 makeDirTreeCursor = \case
   NodeFile a -> DirTreeCursorFile a
-  NodeDir df -> DirTreeCursorDir $ fromJust $ makeDirForestCursor df -- Nested forests can't be empty
+  NodeDir df -> DirTreeCursorDir $ makeDirForestCursor df -- Nested forests can't be empty
 
 rebuildDirTreeCursor :: DirTreeCursor a -> DirTree a
 rebuildDirTreeCursor = \case
   DirTreeCursorFile a -> NodeFile a
-  DirTreeCursorDir dfc -> NodeDir $ rebuildDirForestCursor dfc
+  DirTreeCursorDir dfc -> NodeDir $ maybe DF.empty rebuildDirForestCursor dfc
