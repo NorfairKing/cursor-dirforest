@@ -8,11 +8,16 @@ library:
   dependencies:
   - base >= 4.7 && < 5
   - brick
-  - vty
+  - containers
+  - cursor
+  - cursor-brick
+  - cursor-dirforest
   - directory
   - dirforest
-  - cursor
-  - cursor-dirforest
+  - path
+  - path-io
+  - unix
+  - vty
 
 executables:
   cursor-dirforest-demo:

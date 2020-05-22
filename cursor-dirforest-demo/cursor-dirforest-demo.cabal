@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2e0295b1f80d92422ec2e8ea3da4f3c6ba8a9cd129592c192ab297eb594b8211
+-- hash: 53364238975de7783c6ed24a0ceb1dc10827ff22ffcd7bb6c7e00d9958522ca0
 
 name:           cursor-dirforest-demo
 version:        0.0.0.0
@@ -27,10 +27,15 @@ library
   build-depends:
       base >=4.7 && <5
     , brick
+    , containers
     , cursor
+    , cursor-brick
     , cursor-dirforest
     , directory
     , dirforest
+    , path
+    , path-io
+    , unix
     , vty
   default-language: Haskell2010
 
