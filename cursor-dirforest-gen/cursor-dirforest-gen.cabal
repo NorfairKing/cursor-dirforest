@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bf7a5dee0bce441409a8c5045075d6ddf99c497dbf8a9d10b7cb124652ca8298
+-- hash: 384455ffe13fd0b947a37a662ac97bd41d8f70bd605132a1679560ac5083ce43
 
 name:           cursor-dirforest-gen
 version:        0.0.0.0
@@ -28,6 +28,7 @@ library
       base >=4.7 && <5
     , cursor
     , cursor-dirforest
+    , cursor-gen
     , dirforest
     , genvalidity
     , genvalidity-containers
@@ -48,6 +49,7 @@ test-suite cursor-dirforest-test
     , base >=4.7 && <5
     , cursor-dirforest
     , cursor-dirforest-gen
+    , cursor-gen
     , dirforest
     , genvalidity-hspec
     , hspec

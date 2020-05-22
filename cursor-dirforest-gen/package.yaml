@@ -10,6 +10,7 @@ library:
   source-dirs: src
   dependencies:
   - cursor
+  - cursor-gen
   - cursor-dirforest
   - dirforest
   - genvalidity
@@ -30,5 +31,6 @@ tests:
     - hspec
     - genvalidity-hspec
     - QuickCheck
+    - cursor-gen
     - cursor-dirforest
     - cursor-dirforest-gen

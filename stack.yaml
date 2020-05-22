@@ -7,7 +7,11 @@ packages:
 - ../dirforest/genvalidity-dirforest
 extra-deps:
 - cursor-brick-0.1.0.0
-- cursor-0.3.0.0
+- github: NorfairKing/cursor
+  commit: f9439d72d714a3eda34aaa8dd83ea4ff2976bce8
+  subdirs:
+  - cursor
+  - cursor-gen
 - github: NorfairKing/validity
   commit: 3d5bccbaac055164311ca9d90b0ac7ff7f2c412c
   subdirs:
