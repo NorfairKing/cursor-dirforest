@@ -9,13 +9,16 @@ dependencies:
 library:
   source-dirs: src
   dependencies:
+  - QuickCheck
   - cursor
-  - cursor-gen
   - cursor-dirforest
+  - cursor-gen
   - dirforest
+  - filepath
   - genvalidity
   - genvalidity-containers
   - genvalidity-dirforest
+  - path
 
 tests:
   cursor-dirforest-test:
@@ -42,7 +45,8 @@ benchmarks:
     ghc-options:
     - -Wall
     dependencies:
+    - QuickCheck
     - criterion
-    - genvalidity-criterion
     - cursor-dirforest
     - cursor-dirforest-gen
+    - genvalidity-criterion

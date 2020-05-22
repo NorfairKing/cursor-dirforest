@@ -12,32 +12,6 @@ packages:
   original:
     hackage: cursor-brick-0.1.0.0
 - completed:
-    size: 41547
-    subdir: cursor
-    url: https://github.com/NorfairKing/cursor/archive/f9439d72d714a3eda34aaa8dd83ea4ff2976bce8.tar.gz
-    name: cursor
-    version: 0.3.0.0
-    sha256: fb977153cc3b78f1aab0415dcbc0d6fdac711326b16c7ba7fd290bd822b97128
-    pantry-tree:
-      size: 1811
-      sha256: ae22d0de7e4eee20855930fd8527a2c290fa9b3218b2a566435e14ce9fec5ffa
-  original:
-    subdir: cursor
-    url: https://github.com/NorfairKing/cursor/archive/f9439d72d714a3eda34aaa8dd83ea4ff2976bce8.tar.gz
-- completed:
-    size: 41547
-    subdir: cursor-gen
-    url: https://github.com/NorfairKing/cursor/archive/f9439d72d714a3eda34aaa8dd83ea4ff2976bce8.tar.gz
-    name: cursor-gen
-    version: 0.3.0.0
-    sha256: fb977153cc3b78f1aab0415dcbc0d6fdac711326b16c7ba7fd290bd822b97128
-    pantry-tree:
-      size: 2716
-      sha256: f3b8f17c4328fd3a12ea34e09214e0307b5c9817f739ec5356e8a88709e16bd9
-  original:
-    subdir: cursor-gen
-    url: https://github.com/NorfairKing/cursor/archive/f9439d72d714a3eda34aaa8dd83ea4ff2976bce8.tar.gz
-- completed:
     size: 99638
     subdir: genvalidity
     url: https://github.com/NorfairKing/validity/archive/3d5bccbaac055164311ca9d90b0ac7ff7f2c412c.tar.gz

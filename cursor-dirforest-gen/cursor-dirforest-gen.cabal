@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b24fc95c1e5b4936fc85a290c8bc2475b15061cf295d0996317bcb735ac8fd48
+-- hash: 68dc95eb2ba6fbf6d9fd74c9d12e575d22a8318d8c45babb56974b00ddff7e42
 
 name:           cursor-dirforest-gen
 version:        0.0.0.0
@@ -25,14 +25,17 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
     , cursor
     , cursor-dirforest
     , cursor-gen
     , dirforest
+    , filepath
     , genvalidity
     , genvalidity-containers
     , genvalidity-dirforest
+    , path
   default-language: Haskell2010
 
 test-suite cursor-dirforest-test
@@ -64,7 +67,8 @@ benchmark cursor-dirforest-bench
       bench/
   ghc-options: -Wall
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
     , criterion
     , cursor-dirforest
     , cursor-dirforest-gen

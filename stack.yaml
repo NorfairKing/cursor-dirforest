@@ -5,13 +5,15 @@ packages:
 - cursor-dirforest-demo
 - ../dirforest/dirforest
 - ../dirforest/genvalidity-dirforest
+- ../cursor/cursor
+- ../cursor/cursor-gen
 extra-deps:
 - cursor-brick-0.1.0.0
-- github: NorfairKing/cursor
-  commit: f9439d72d714a3eda34aaa8dd83ea4ff2976bce8
-  subdirs:
-  - cursor
-  - cursor-gen
+# - github: NorfairKing/cursor
+#   commit: f9439d72d714a3eda34aaa8dd83ea4ff2976bce8
+#   subdirs:
+#   - cursor
+#   - cursor-gen
 - github: NorfairKing/validity
   commit: 3d5bccbaac055164311ca9d90b0ac7ff7f2c412c
   subdirs:
