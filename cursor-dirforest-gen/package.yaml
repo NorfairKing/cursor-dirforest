@@ -34,3 +34,15 @@ tests:
     - cursor-gen
     - cursor-dirforest
     - cursor-dirforest-gen
+
+benchmarks:
+  cursor-dirforest-bench:
+    main: Main.hs
+    source-dirs: bench/
+    ghc-options:
+    - -Wall
+    dependencies:
+    - criterion
+    - genvalidity-criterion
+    - cursor-dirforest
+    - cursor-dirforest-gen

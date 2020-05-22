@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 97c41fc1639fdab9134d17f69f32086b116a36b25472fba3945b5c09a428f547
+-- hash: dcaf5dfaed7cf923ae89543ecd62a0d9378642eec699d7938aca21651b3142fe
 
 name:           cursor-dirforest
 version:        0.0.0.0
@@ -24,10 +24,12 @@ library
       Paths_cursor_dirforest
   hs-source-dirs:
       src
+  ghc-options: -Wall -fwarn-redundant-constraints
   build-depends:
       base >=4.7 && <5
     , containers
     , cursor
+    , deepseq
     , dirforest
     , validity
   default-language: Haskell2010

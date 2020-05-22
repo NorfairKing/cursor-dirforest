@@ -3,6 +3,7 @@
 
 module Cursor.DirForest where
 
+import Control.DeepSeq
 import Cursor.Map
 import Data.DirForest (DirForest (..), DirTree (..))
 import qualified Data.DirForest as DF
@@ -18,12 +19,16 @@ newtype DirForestCursor a = DirForestCursor {dirForestCursorMapCursor :: MapCurs
 instance (Validity a, Ord a) => Validity (DirForestCursor a) where
   validate dfc = mconcat [genericValidate dfc, delve "it can be rebuilt to a valid dirforest" $ rebuildDirForestCursor dfc]
 
+instance (NFData a, Ord a) => NFData (DirForestCursor a)
+
 data DirTreeCursor a
   = DirTreeCursorFile a
   | DirTreeCursorDir (DirForestCursor a)
   deriving (Show, Eq, Generic)
 
 instance (Validity a, Ord a) => Validity (DirTreeCursor a)
+
+instance (NFData a, Ord a) => NFData (DirTreeCursor a)
 
 makeDirForestCursor :: DirForest a -> Maybe (DirForestCursor a)
 makeDirForestCursor (DirForest m) = fmap DirForestCursor $ makeMapCursor id <$> NE.nonEmpty (M.toList m)
