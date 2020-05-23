@@ -45,3 +45,11 @@ rebuildDirTreeCursor :: DirTreeCursor a -> DirTree a
 rebuildDirTreeCursor = \case
   DirTreeCursorFile a -> NodeFile a
   DirTreeCursorDir dfc -> NodeDir $ maybe DF.empty rebuildDirForestCursor dfc
+
+foldDirForestCursor :: ([(FilePath, DirTree a)] -> KeyValueCursor FilePath (DirTreeCursor a) FilePath (DirTree a) -> [(FilePath, DirTree a)] -> c) -> DirForestCursor a -> c
+foldDirForestCursor func (DirForestCursor m) = foldMapCursor func m
+
+foldDirTreeCursor :: (a -> b) -> (Maybe (DirForestCursor a) -> b) -> DirTreeCursor a -> b
+foldDirTreeCursor fileFunc dirFunc = \case
+  DirTreeCursorFile a -> fileFunc a
+  DirTreeCursorDir mdf -> dirFunc mdf

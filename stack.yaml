@@ -2,6 +2,7 @@ resolver: lts-14.23
 packages:
 - cursor-dirforest
 - cursor-dirforest-gen
+- cursor-dirforest-brick
 - cursor-dirforest-demo
 - ../dirforest/dirforest
 - ../dirforest/genvalidity-dirforest

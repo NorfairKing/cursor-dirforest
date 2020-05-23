@@ -12,6 +12,7 @@ library:
   - cursor
   - cursor-brick
   - cursor-dirforest
+  - cursor-dirforest-brick
   - directory
   - dirforest
   - path

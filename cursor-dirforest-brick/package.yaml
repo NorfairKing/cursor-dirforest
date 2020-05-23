@@ -1,0 +1,16 @@
+name:                cursor-dirforest-brick
+version:             0.0.0.0
+github:              "NorfairKing/cursor-dirforest"
+license:             MIT
+
+library:
+  source-dirs: src
+  dependencies:
+  - base >= 4.7 && < 5
+  - brick
+  - containers
+  - cursor
+  - cursor-brick
+  - cursor-dirforest
+  - vty
+  - dirforest
