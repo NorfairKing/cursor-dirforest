@@ -3,15 +3,27 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Cursor.DirForest.Brick
-  ( verticalDirForestCursorWidget,
+  ( verticalPaddedDirForestCursorWidget,
+    verticalDirForestCursorWidget,
     dirForestCursorWidget,
   )
 where
 
 import Brick.Types
 import Brick.Widgets.Core
+import Cursor.Brick.Forest
 import Cursor.DirForest
+import Cursor.Forest
 import Cursor.Tree
+
+verticalPaddedDirForestCursorWidget ::
+  (FileOrDir a -> Widget n) ->
+  (FileOrDir b -> Widget n) ->
+  Int ->
+  DirForestCursor a b ->
+  Widget n
+verticalPaddedDirForestCursorWidget goA goB padding =
+  verticalPaddedForestCursorWidget goA goB padding . dirForestCursorForestCursor
 
 verticalDirForestCursorWidget ::
   (CTree (FileOrDir b) -> Widget n) ->

@@ -8,6 +8,7 @@ packages:
 - ../dirforest/genvalidity-dirforest
 - ../cursor/cursor
 - ../cursor/cursor-gen
+- ../cursor-brick/cursor-brick
 - ../validity/genvalidity
 - ../validity/genvalidity-aeson
 - ../validity/genvalidity-bytestring
@@ -42,7 +43,7 @@ packages:
 - ../validity/validity-vector
 
 extra-deps:
-- cursor-brick-0.1.0.0
+# - cursor-brick-0.1.0.0
 # - github: NorfairKing/cursor
 #   commit: f9439d72d714a3eda34aaa8dd83ea4ff2976bce8
 #   subdirs:

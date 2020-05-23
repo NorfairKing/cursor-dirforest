@@ -6,6 +6,7 @@
 module Cursor.Simple.DirForest
   ( -- * Types
     DirForestCursor,
+    DFC.dirForestCursorForestCursor,
     DFC.FileOrDir (..),
 
     -- * Construction and deconstruction
