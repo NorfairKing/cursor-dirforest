@@ -12,6 +12,5 @@ import Data.GenValidity.Criterion
 main :: IO ()
 main =
   Criterion.defaultMain
-    [ genValidBench @(DirTreeCursor Int),
-      genValidBench @(DirForestCursor Int)
+    [ genValidBench @(DirForestCursor Int Int)
     ]

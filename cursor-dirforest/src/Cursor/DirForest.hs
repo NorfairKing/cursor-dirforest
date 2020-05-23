@@ -15,6 +15,7 @@ module Cursor.DirForest
 
     -- ** Rebuild
     rebuildDirForestCursor,
+    isTopLevel,
   )
 where
 
@@ -141,13 +142,12 @@ data FileOrDir a = FodFile (Path Rel File) a | FodDir (Path Rel Dir)
 
 instance (Validity a) => Validity (FileOrDir a) where
   validate fod =
-    let isTopLevel p_ = parent p_ == [reldir|./|]
-     in mconcat
-          [ genericValidate fod,
-            declare "The path is toplevel" $ case fod of
-              FodFile rf _ -> isTopLevel rf
-              FodDir rd -> isTopLevel rd
-          ]
+    mconcat
+      [ genericValidate fod,
+        declare "The path is toplevel" $ case fod of
+          FodFile rf _ -> isTopLevel rf
+          FodDir rd -> isTopLevel rd
+      ]
 
 instance NFData a => NFData (FileOrDir a)
 
@@ -183,6 +183,7 @@ rebuildDirForestCursor func = fromForest . NE.toList . NE.map rebuildCTree . reb
         goT (Node fod f) = case fod of
           FodFile rf v -> (fromRelFile rf, NodeFile v)
           FodDir rd -> (FP.dropTrailingPathSeparator $ fromRelDir rd, NodeDir $ goF f)
+
 -- foldDirForestCursor :: ([(FilePath, DirTree a)] -> KeyValueCursor FilePath (DirForestCursor a) FilePath (DirTree a) -> [(FilePath, DirTree a)] -> c) -> DirForestCursor a -> c
 -- foldDirForestCursor func (DirForestCursor m) = foldMapCursor func m
 --
@@ -257,3 +258,6 @@ rebuildDirForestCursor func = fromForest . NE.toList . NE.map rebuildCTree . reb
 --
 -- rebuildValueCursor :: DirForestCursor a -> DirTree a
 -- rebuildValueCursor = NodeDir . rebuildDirForestCursor
+--
+isTopLevel :: Path Rel t -> Bool
+isTopLevel p_ = parent p_ == [reldir|./|]

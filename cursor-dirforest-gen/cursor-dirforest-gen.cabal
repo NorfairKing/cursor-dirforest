@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cfa007af61de82fb4830d35c09baa3539e37d0c99a34d5f19ecc972ab2511f39
+-- hash: 1da160b10f07fe5bdd1d0eb74a04c4404bfd05ad16e5dcd0117e612509594d10
 
 name:           cursor-dirforest-gen
 version:        0.0.0.0
@@ -27,6 +27,7 @@ library
   build-depends:
       QuickCheck
     , base >=4.7 && <5
+    , containers
     , cursor
     , cursor-dirforest
     , cursor-gen

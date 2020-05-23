@@ -10,6 +10,7 @@ library:
   source-dirs: src
   dependencies:
   - QuickCheck
+  - containers
   - cursor
   - cursor-dirforest
   - cursor-gen
