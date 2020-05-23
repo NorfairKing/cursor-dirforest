@@ -39,12 +39,3 @@ instance (GenValid a, Ord a) => GenValid (DirForestCursor a) where
         mdfc <- resize a genValid
         fp <- resize b $ FP.dropTrailingPathSeparator . fromRelDir <$> (genValid `suchThat` isTopLevel)
         pure (fp, mdfc)
-
-instance (GenValid a, Ord a) => GenValid (DirTreeCursor a) where
-  shrinkValid = shrinkValidStructurally
-  genValid = sized $ \n ->
-    scale (\x -> max 0 $ x - 1) $
-      oneof
-        [ DirTreeCursorFile <$> genValid,
-          DirTreeCursorDir <$> genValid
-        ]

@@ -23,8 +23,6 @@ import Test.Validity.Shrinking
 
 spec :: Spec
 spec = modifyMaxShrinks (const 0) $ do
-  genValidSpec @(DirTreeCursor Word8)
-  -- shrinkValidSpecWithLimit @(DirTreeCursor Word8) 1
   -- No shrinking until I figure out what the problem is
   genValidSpec @(DirForestCursor Word8)
   describe "shrinkValid DirForestCursor" $ do
@@ -40,12 +38,6 @@ spec = modifyMaxShrinks (const 0) $ do
       shouldBeValid $ makeDirForestCursor (DF.empty @Word8)
     it "produces valid cursors" $ producesValidsOnValids (makeDirForestCursor @Word8)
   describe "rebuildDirForestCursor" $ it "produces valid dirforests" $ producesValidsOnValids (rebuildDirForestCursor @Word8)
-  describe "makeDirTreeCursor" $ do
-    it "works for a dirtree with an empty dirforest below"
-      $ shouldBeValid
-      $ makeDirTreeCursor (NodeDir (DF.empty @Word8))
-    it "produces valid cursors" $ producesValidsOnValids (makeDirTreeCursor @Word8)
-  describe "rebuildDirTreeCursor" $ it "produces valid dirforests" $ producesValidsOnValids (rebuildDirTreeCursor @Word8)
   describe "dirForestCursorSelectPrevTreeOnSameLevel" $ forestMovementMSpec dirForestCursorSelectPrevTreeOnSameLevel
   describe "dirForestCursorSelectNextTreeOnSameLevel" $ forestMovementMSpec dirForestCursorSelectNextTreeOnSameLevel
   xdescribe "is not true because of subselections" $ describe "dirForestCursorSelectPrevTreeOnSameLevel and dirForestCursorSelectNextTreeOnSameLevel" $ do
@@ -64,8 +56,6 @@ spec = modifyMaxShrinks (const 0) $ do
     inverseMovementsSpec dirForestCursorSelectFirstOnSameLevel dirForestCursorSelectLastOnSameLevel
   describe "dirForestCursorSelectFirstChild" $ forestMovementMSpec dirForestCursorSelectFirstChild
   describe "dirForestCursorSelectLastChild" $ forestMovementMSpec dirForestCursorSelectLastChild
-  describe "dirTreeCursorSelectFirstChild" $ treeMovementMSpec dirTreeCursorSelectFirstChild
-  describe "dirTreeCursorSelectLastChild" $ treeMovementMSpec dirTreeCursorSelectLastChild
   describe "dirForestCursorSelectParent" $ do
     it "produces valid cursors" $ producesValidsOnValids (dirForestCursorSelectParent @Word8)
     it "is the inverse of dirForestCursorSelectFirstChild" $ inverseFunctionsIfSucceedOnValid dirForestCursorSelectFirstChild (dirForestCursorSelectParent @Word8)
@@ -105,11 +95,3 @@ forestMovementSpec func = do
   it "is a movement" $ forAllValid $ \dfc ->
     let dfc' = func @Word8 dfc
      in rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
-
-treeMovementMSpec :: (forall a. (Show a, Eq a, GenValid a) => DirTreeCursor a -> Maybe (DirTreeCursor a)) -> Spec
-treeMovementMSpec func = do
-  it "produces valid results" $ producesValidsOnValids (func @Word8)
-  it "is a movement" $ forAllValid $ \dfc ->
-    case func @Word8 dfc of
-      Nothing -> pure () -- Fine
-      Just dfc' -> rebuildDirTreeCursor dfc' `shouldBe` rebuildDirTreeCursor dfc
