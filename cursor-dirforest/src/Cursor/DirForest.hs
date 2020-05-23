@@ -34,6 +34,8 @@ module Cursor.DirForest
     dirForestCursorSelectLastTree,
     dirForestCursorSelectPrev,
     dirForestCursorSelectNext,
+    dirForestCursorSelectFirst,
+    dirForestCursorSelectLast,
     dirForestCursorSelectFirstChild,
     dirForestCursorSelectLastChild,
     dirForestCursorSelectParent,
@@ -52,15 +54,12 @@ module Cursor.DirForest
 where
 
 import Control.DeepSeq
-import Control.Monad
 import Cursor.Forest
 import Cursor.List.NonEmpty
 import Cursor.Tree
 import Data.DirForest (DirForest (..), DirTree (..))
-import qualified Data.DirForest as DF
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
-import Data.Maybe
 import Data.Tree
 import Data.Validity
 import GHC.Generics (Generic)
@@ -230,6 +229,12 @@ dirForestCursorSelectPrev f g = dirForestCursorForestCursorL $ forestCursorSelec
 
 dirForestCursorSelectNext :: (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorSelectNext f g = dirForestCursorForestCursorL $ forestCursorSelectNext (fmap f) (fmap g)
+
+dirForestCursorSelectFirst :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DirForestCursor a b
+dirForestCursorSelectFirst f g = dirForestCursorForestCursorL %~ forestCursorSelectFirst (fmap f) (fmap g)
+
+dirForestCursorSelectLast :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DirForestCursor a b
+dirForestCursorSelectLast f g = dirForestCursorForestCursorL %~ forestCursorSelectLast (fmap f) (fmap g)
 
 dirForestCursorSelectFirstChild :: (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorSelectFirstChild f g = dirForestCursorForestCursorL $ forestCursorSelectBelowAtStart (fmap f) (fmap g)

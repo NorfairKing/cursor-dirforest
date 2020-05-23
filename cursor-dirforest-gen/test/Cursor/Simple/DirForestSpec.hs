@@ -10,24 +10,23 @@ where
 
 import Cursor.DirForest.Gen ()
 import Cursor.Simple.DirForest
-import Data.DirForest (DirForest (..), DirTree (..))
 import qualified Data.DirForest as DF
 import Data.Word
-import Debug.Trace
 import Path
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.Validity
-import Test.Validity.Optics
-import Test.Validity.Shrinking
 
 spec :: Spec
 spec = modifyMaxShrinks (const 0) $ do
   -- No shrinking until I figure out what the problem is
   genValidSpec @(DirForestCursor Word8)
   describe "shrinkValid DirForestCursor" $ do
-    it "does not shrink the singleton dirforest cursor to itself" $
-      let df = DF.singleton [relfile|a|] 'a'
+    it "does not shrink the singletonFile dirforest cursor to itself" $
+      let df = makeDirForestCursor $ DF.singletonFile [relfile|a|] 'a'
+       in shrinkValid df `shouldNotSatisfy` (elem df)
+    it "does not shrink the singletonDir dirforest cursor to itself" $
+      let df = makeDirForestCursor $ DF.singletonDir [reldir|a|] :: Maybe (DirForestCursor Char)
        in shrinkValid df `shouldNotSatisfy` (elem df)
   -- it "does not shrink a value to itself" $ do
   --   shrinkValidDoesNotShrinkToItselfWithLimit @(DirForestCursor Word8) 1
@@ -58,6 +57,8 @@ spec = modifyMaxShrinks (const 0) $ do
     inverseMovementsSpec dirForestCursorSelectFirstOnSameLevel dirForestCursorSelectLastOnSameLevel
   describe "dirForestCursorSelectPrev" $ forestMovementMSpec dirForestCursorSelectPrev
   describe "dirForestCursorSelectNext" $ forestMovementMSpec dirForestCursorSelectNext
+  describe "dirForestCursorSelectFirst" $ forestMovementSpec dirForestCursorSelectFirst
+  describe "dirForestCursorSelectLast" $ forestMovementSpec dirForestCursorSelectLast
   describe "dirForestCursorSelectFirstChild" $ forestMovementMSpec dirForestCursorSelectFirstChild
   describe "dirForestCursorSelectLastChild" $ forestMovementMSpec dirForestCursorSelectLastChild
   describe "dirForestCursorSelectParent" $ do

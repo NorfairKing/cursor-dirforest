@@ -3,23 +3,19 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Cursor.DirForest.Gen where
 
 import Cursor.DirForest
 import Cursor.Forest
-import Cursor.Forest.Gen
+import Cursor.Forest.Gen ()
 import Cursor.List.NonEmpty
 import Cursor.Tree
-import Data.DirForest (DirForest (..), DirTree (..))
-import qualified Data.DirForest as DF
 import Data.GenValidity
-import Data.GenValidity.Containers
-import Data.GenValidity.DirForest
+import Data.GenValidity.Containers ()
+import Data.GenValidity.DirForest ()
 import Data.Tree
-import Debug.Trace
-import Path
-import qualified System.FilePath as FP
 import Test.QuickCheck
 
 instance (GenValid a) => GenValid (FileOrDir a) where
@@ -65,8 +61,8 @@ instance (GenValid a, GenValid b) => GenValid (DirForestCursor a b) where
       goTreeCursor = sized $ \s -> do
         (a, b, c) <- genSplit3 s
         treeAbove <- resize a goMAbove
-        treeCurrent <- genValid
-        treeBelow <- case treeCurrent of
+        treeCurrent <- resize b genValid
+        treeBelow <- resize c $ case treeCurrent of
           FodFile _ _ -> pure EmptyCForest
           FodDir _ -> goCForest
         pure TreeCursor {..}
@@ -78,5 +74,5 @@ instance (GenValid a, GenValid b) => GenValid (DirForestCursor a b) where
         treeAboveLefts <- resize a $ genListOf goCTree
         treeAboveAbove <- resize b goMAbove
         treeAboveNode <- resize c $ FodDir <$> (genValid `suchThat` isTopLevel)
-        treeAboveRights <- resize a $ genListOf goCTree
+        treeAboveRights <- resize d $ genListOf goCTree
         pure TreeAbove {..}

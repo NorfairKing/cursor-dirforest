@@ -8,18 +8,10 @@ module Cursor.DirForest.Brick
   )
 where
 
-import Brick.AttrMap
-import Brick.Main
 import Brick.Types
 import Brick.Widgets.Core
-import Cursor.Brick
 import Cursor.DirForest
 import Cursor.Tree
-import qualified Data.DirForest as DF
-import Data.DirForest (DirForest (..), DirTree (..))
-import Data.Int
-import qualified Data.Map as M
-import Graphics.Vty.Input.Events
 
 verticalDirForestCursorWidget ::
   (CTree (FileOrDir b) -> Widget n) ->
