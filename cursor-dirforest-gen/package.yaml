@@ -33,6 +33,7 @@ tests:
     - dirforest
     - hspec
     - genvalidity-hspec
+    - genvalidity-hspec-optics
     - QuickCheck
     - cursor-gen
     - cursor-dirforest

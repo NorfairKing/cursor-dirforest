@@ -1,7 +1,33 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
 
-module Cursor.DirForest where
+module Cursor.DirForest
+  ( -- * Types
+    DirForestCursor (..),
+    DirTreeCursor (..),
+
+    -- ** Lenses
+    dirForestCursorMapCursorL,
+
+    -- * Construction and deconstruction
+
+    -- ** Make
+    makeDirForestCursor,
+    makeDirTreeCursor,
+
+    -- ** Rebuild
+    rebuildDirForestCursor,
+    rebuildDirTreeCursor,
+
+    -- ** Fold
+    foldDirForestCursor,
+    foldDirTreeCursor,
+
+    -- * Movements
+    dirForestCursorSelectPrevOnSameLevel,
+    dirForestCursorSelectNextOnSameLevel,
+  )
+where
 
 import Control.DeepSeq
 import Cursor.Map
@@ -12,6 +38,7 @@ import qualified Data.Map as M
 import Data.Maybe
 import Data.Validity
 import GHC.Generics (Generic)
+import Lens.Micro
 
 newtype DirForestCursor a = DirForestCursor {dirForestCursorMapCursor :: MapCursor FilePath (DirTreeCursor a) FilePath (DirTree a)}
   deriving (Show, Eq, Generic)
@@ -29,6 +56,9 @@ data DirTreeCursor a
 instance (Validity a, Ord a) => Validity (DirTreeCursor a)
 
 instance (NFData a, Ord a) => NFData (DirTreeCursor a)
+
+dirForestCursorMapCursorL :: Lens' (DirForestCursor a) (MapCursor FilePath (DirTreeCursor a) FilePath (DirTree a))
+dirForestCursorMapCursorL = lens dirForestCursorMapCursor $ \dfc mc -> dfc {dirForestCursorMapCursor = mc}
 
 makeDirForestCursor :: DirForest a -> Maybe (DirForestCursor a)
 makeDirForestCursor (DirForest m) = fmap DirForestCursor $ makeMapCursor id <$> NE.nonEmpty (M.toList m)
@@ -53,3 +83,15 @@ foldDirTreeCursor :: (a -> b) -> (Maybe (DirForestCursor a) -> b) -> DirTreeCurs
 foldDirTreeCursor fileFunc dirFunc = \case
   DirTreeCursorFile a -> fileFunc a
   DirTreeCursorDir mdf -> dirFunc mdf
+
+dirForestCursorSelectPrevOnSameLevel :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectPrevOnSameLevel = dirForestCursorMapCursorL $ mapCursorSelectPrev rebuildKeyCursor makeKeyCursor rebuildDirTreeCursor
+
+dirForestCursorSelectNextOnSameLevel :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectNextOnSameLevel = dirForestCursorMapCursorL $ mapCursorSelectNext rebuildKeyCursor makeKeyCursor rebuildDirTreeCursor
+
+makeKeyCursor :: FilePath -> FilePath
+makeKeyCursor = id
+
+rebuildKeyCursor :: FilePath -> FilePath
+rebuildKeyCursor = id

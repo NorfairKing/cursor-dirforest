@@ -49,7 +49,7 @@ tuiApp =
 buildInitialState :: IO TuiState
 buildInitialState = do
   here <- getCurrentDir
-  df <- DF.read here $ \fp -> do
+  df <- DF.readNonHidden here $ \fp -> do
     COff size <- fileSize <$> getFileStatus (fromAbsFile fp)
     pure size
   pure $ TuiState $ makeDirForestCursor df

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dcaf5dfaed7cf923ae89543ecd62a0d9378642eec699d7938aca21651b3142fe
+-- hash: b0af52abad036a1db605818cfb14509394c3a1f9f71d2a6b4fd32ef20f5be9b0
 
 name:           cursor-dirforest
 version:        0.0.0.0
@@ -31,5 +31,6 @@ library
     , cursor
     , deepseq
     , dirforest
+    , microlens
     , validity
   default-language: Haskell2010
