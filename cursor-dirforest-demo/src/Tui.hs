@@ -11,22 +11,17 @@ import Brick.Util
 import Brick.Widgets.Core
 import Cursor.Brick
 import Cursor.DirForest.Brick
-import Cursor.Map
 import Cursor.Simple.DirForest
 import Cursor.Simple.Forest
 import Cursor.Simple.Tree
 import qualified Data.DirForest as DF
-import Data.DirForest (DirForest (..), DirTree (..))
 import Data.Int
 import qualified Data.List.NonEmpty as NE
-import qualified Data.Map as M
 import Data.Maybe
-import Data.Tree
 import Graphics.Vty.Attributes
 import Graphics.Vty.Input.Events
 import Path
 import Path.IO
-import System.Directory
 import System.Posix
 import Text.Show.Pretty
 
@@ -94,10 +89,6 @@ drawDirForestInt64Cursor =
     goFod = \case
       FodFile rf i -> withDefAttr fileAttr $ str $ fromRelFile rf <> " " <> show i <> " bytes"
       FodDir rd -> withDefAttr dirAttr $ str $ fromRelDir rd
-    goTree :: Tree (FileOrDir Int64) -> Widget n
-    goTree (Node fod f) = goFod fod <=> padLeft (Pad 2) (goForest f)
-    goForest :: Forest (FileOrDir Int64) -> Widget n
-    goForest = vBox . map goTree
     goCTree :: CTree (FileOrDir Int64) -> Widget n
     goCTree (CNode fod cf) = goFod fod <=> padLeft (Pad 2) (goCForest cf)
     goCForest :: CForest (FileOrDir Int64) -> Widget n
@@ -109,7 +100,7 @@ drawDirForestInt64Cursor =
     goTC = treeCursorWidget wrap cur
       where
         wrap :: [CTree (FileOrDir Int64)] -> FileOrDir Int64 -> [CTree (FileOrDir Int64)] -> Widget n -> Widget n
-        wrap lefts above rights cur = goFod above <=> padLeft (Pad 2) (vBox $ concat [map goCTree lefts, [cur], map goCTree rights])
+        wrap lefts above rights curW = goFod above <=> padLeft (Pad 2) (vBox $ concat [map goCTree lefts, [curW], map goCTree rights])
         cur :: FileOrDir Int64 -> CForest (FileOrDir Int64) -> Widget n
         cur fod cf = withAttr selectedAttr (goFod fod) <=> padLeft (Pad 2) (goCForest cf)
 
