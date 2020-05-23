@@ -31,13 +31,25 @@ spec = do
       $ makeDirTreeCursor (NodeDir (DF.empty @Int))
     it "produces valid cursors" $ producesValidsOnValids (makeDirTreeCursor @Int)
   describe "rebuildDirTreeCursor" $ it "produces valid dirforests" $ producesValidsOnValids (rebuildDirTreeCursor @Int)
-  describe "dirForestCursorSelectPrevOnSameLevel" $ movementMSpec (dirForestCursorSelectPrevOnSameLevel)
-  describe "dirForestCursorSelectNextOnSameLevel" $ movementMSpec (dirForestCursorSelectNextOnSameLevel)
+  describe "dirForestCursorSelectPrevOnSameLevel" $ forestMovementMSpec dirForestCursorSelectPrevOnSameLevel
+  describe "dirForestCursorSelectNextOnSameLevel" $ forestMovementMSpec dirForestCursorSelectNextOnSameLevel
+  describe "dirForestCursorSelectFirstChild" $ forestMovementMSpec dirForestCursorSelectFirstChild
+  describe "dirForestCursorSelectLastChild" $ forestMovementMSpec dirForestCursorSelectLastChild
+  describe "dirTreeCursorSelectFirstChild" $ treeMovementMSpec dirTreeCursorSelectFirstChild
+  describe "dirTreeCursorSelectLastChild" $ treeMovementMSpec dirTreeCursorSelectLastChild
 
-movementMSpec :: (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> Maybe (DirForestCursor a)) -> Spec
-movementMSpec func = do
+forestMovementMSpec :: (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> Maybe (DirForestCursor a)) -> Spec
+forestMovementMSpec func = do
   it "produces valid results" $ producesValidsOnValids (func @Int)
   it "is a movement" $ forAllValid $ \dfc ->
     case func @Int dfc of
       Nothing -> pure () -- Fine
       Just dfc' -> rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
+
+treeMovementMSpec :: (forall a. (Show a, Eq a, GenValid a) => DirTreeCursor a -> Maybe (DirTreeCursor a)) -> Spec
+treeMovementMSpec func = do
+  it "produces valid results" $ producesValidsOnValids (func @Int)
+  it "is a movement" $ forAllValid $ \dfc ->
+    case func @Int dfc of
+      Nothing -> pure () -- Fine
+      Just dfc' -> rebuildDirTreeCursor dfc' `shouldBe` rebuildDirTreeCursor dfc

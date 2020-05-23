@@ -62,7 +62,9 @@ buildInitialState = do
   pure $ TuiState $ makeDirForestCursor df
 
 drawTui :: TuiState -> [Widget n]
-drawTui ts = [maybe emptyWidget drawDirForestInt64Cursor (stateCursor ts)]
+drawTui ts =
+  let dfc = stateCursor ts
+   in [maybe emptyWidget drawDirForestInt64Cursor dfc, str (ppShow dfc)]
 
 drawDirForestInt64Cursor :: DirForestCursor Int64 -> Widget n
 drawDirForestInt64Cursor =
@@ -108,7 +110,10 @@ handleTuiEvent s e =
           doM func = doP (\c -> fromMaybe c $ func c)
        in case vtye of
             EvKey (KChar 'q') [] -> halt s
+            EvKey (KChar 'f') [] -> doM dirForestCursorSelectFirstChild
+            EvKey (KChar 'l') [] -> doM dirForestCursorSelectLastChild
             EvKey (KChar 'j') [] -> doM dirForestCursorSelectNextOnSameLevel
+            EvKey (KChar 'k') [] -> doM dirForestCursorSelectPrevOnSameLevel
             EvKey KDown [] -> doM dirForestCursorSelectNextOnSameLevel
             EvKey KUp [] -> doM dirForestCursorSelectPrevOnSameLevel
             _ -> continue s

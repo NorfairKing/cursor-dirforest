@@ -26,10 +26,15 @@ module Cursor.DirForest
     -- * Movements
     dirForestCursorSelectPrevOnSameLevel,
     dirForestCursorSelectNextOnSameLevel,
+    dirForestCursorSelectFirstChild,
+    dirForestCursorSelectLastChild,
+    dirTreeCursorSelectFirstChild,
+    dirTreeCursorSelectLastChild,
   )
 where
 
 import Control.DeepSeq
+import Control.Monad
 import Cursor.Map
 import Data.DirForest (DirForest (..), DirTree (..))
 import qualified Data.DirForest as DF
@@ -40,11 +45,22 @@ import Data.Validity
 import GHC.Generics (Generic)
 import Lens.Micro
 
-newtype DirForestCursor a = DirForestCursor {dirForestCursorMapCursor :: MapCursor FilePath (DirTreeCursor a) FilePath (DirTree a)}
+-- | A cursor for a dirforest
+--
+-- A user can look at any file or directory in the forest.
+--
+-- Internally this cursor is represented as a nonempty map cursor of paths and directory trees or directory tree cursors.
+-- When, inside the KeyValueCursor, the key is selected, that means that that filepath is selected.
+-- When the value is selected, that means that the some file or dir below is selected.
+newtype DirForestCursor a = DirForestCursor {dirForestCursorMapCursor :: MapCursor FilePath (Maybe (DirForestCursor a)) FilePath (DirTree a)}
   deriving (Show, Eq, Generic)
 
 instance (Validity a, Ord a) => Validity (DirForestCursor a) where
-  validate dfc = mconcat [genericValidate dfc, delve "it can be rebuilt to a valid dirforest" $ rebuildDirForestCursor dfc]
+  validate dfc@(DirForestCursor mc) =
+    mconcat
+      [ genericValidate dfc,
+        delve "it can be rebuilt to a valid dirforest" $ rebuildDirForestCursor dfc
+      ]
 
 instance (NFData a, Ord a) => NFData (DirForestCursor a)
 
@@ -89,6 +105,32 @@ dirForestCursorSelectPrevOnSameLevel = dirForestCursorMapCursorL $ mapCursorSele
 
 dirForestCursorSelectNextOnSameLevel :: DirForestCursor a -> Maybe (DirForestCursor a)
 dirForestCursorSelectNextOnSameLevel = dirForestCursorMapCursorL $ mapCursorSelectNext rebuildKeyCursor makeKeyCursor rebuildDirTreeCursor
+
+dirForestCursorSelectFirstChild :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectFirstChild =
+  dirForestCursorMapCursorL $
+    (mapCursorTraverseValueCase (\fp dtc -> (,) fp <$> dirTreeCursorSelectFirstChild dtc))
+      . (mapCursorSelectValue rebuildKeyCursor makeDirTreeCursor)
+
+dirForestCursorSelectLastChild :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectLastChild =
+  dirForestCursorMapCursorL $
+    (mapCursorTraverseValueCase (\fp dtc -> (,) fp <$> dirTreeCursorSelectLastChild dtc))
+      . (mapCursorSelectValue rebuildKeyCursor makeDirTreeCursor)
+
+dirTreeCursorSelectFirstChild :: DirTreeCursor a -> Maybe (DirTreeCursor a)
+dirTreeCursorSelectFirstChild = \case
+  DirTreeCursorFile _ -> Nothing
+  DirTreeCursorDir mdf -> do
+    df <- mdf
+    (DirTreeCursorDir . Just) <$> dirForestCursorSelectFirstChild df
+
+dirTreeCursorSelectLastChild :: DirTreeCursor a -> Maybe (DirTreeCursor a)
+dirTreeCursorSelectLastChild = \case
+  DirTreeCursorFile _ -> Nothing
+  DirTreeCursorDir mdf -> do
+    df <- mdf
+    (DirTreeCursorDir . Just) <$> dirForestCursorSelectLastChild df
 
 makeKeyCursor :: FilePath -> FilePath
 makeKeyCursor = id
