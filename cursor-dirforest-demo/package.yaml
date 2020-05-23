@@ -16,6 +16,7 @@ library:
   - directory
   - dirforest
   - path
+  - pretty-show
   - path-io
   - unix
   - vty

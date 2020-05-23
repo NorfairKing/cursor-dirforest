@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9606d4a34c4ea9e99e042a27780e4e172deec74c8155ae168313163b2a986980
+-- hash: e8d481233df8f3a74cf8066e86eb810c6ef19e6836d427b07a19cb9c44efef79
 
 name:           cursor-dirforest-demo
 version:        0.0.0.0
@@ -36,6 +36,7 @@ library
     , dirforest
     , path
     , path-io
+    , pretty-show
     , unix
     , vty
   default-language: Haskell2010
