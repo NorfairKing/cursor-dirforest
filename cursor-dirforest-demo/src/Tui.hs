@@ -10,14 +10,18 @@ import Brick.Types
 import Brick.Util
 import Brick.Widgets.Core
 import Cursor.Brick
-import Cursor.DirForest
 import Cursor.DirForest.Brick
 import Cursor.Map
+import Cursor.Simple.DirForest
+import Cursor.Simple.Forest
+import Cursor.Simple.Tree
 import qualified Data.DirForest as DF
 import Data.DirForest (DirForest (..), DirTree (..))
 import Data.Int
+import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
 import Data.Maybe
+import Data.Tree
 import Graphics.Vty.Attributes
 import Graphics.Vty.Input.Events
 import Path
@@ -47,11 +51,24 @@ tuiApp =
       appChooseCursor = showFirstCursor,
       appHandleEvent = handleTuiEvent,
       appStartEvent = pure,
-      appAttrMap = const $ attrMap defAttr [(selectedAttr, fg white)]
+      appAttrMap =
+        const $
+          attrMap
+            defAttr
+            [ (selectedAttr, bg white),
+              (fileAttr, fg blue),
+              (dirAttr, fg red)
+            ]
     }
 
 selectedAttr :: AttrName
 selectedAttr = "selected"
+
+fileAttr :: AttrName
+fileAttr = "file"
+
+dirAttr :: AttrName
+dirAttr = "dir"
 
 buildInitialState :: IO TuiState
 buildInitialState = do
@@ -64,36 +81,37 @@ buildInitialState = do
 drawTui :: TuiState -> [Widget n]
 drawTui ts =
   let dfc = stateCursor ts
-   in [vBox [maybe emptyWidget drawDirForestInt64Cursor dfc, str (ppShow dfc)]]
+   in [maybe emptyWidget drawDirForestInt64Cursor dfc]
 
 drawDirForestInt64Cursor :: DirForestCursor Int64 -> Widget n
 drawDirForestInt64Cursor =
   verticalDirForestCursorWidget
-    goDirTreePair
-    goKVC
-    goDirTreePair
+    goCTree
+    goTC
+    goCTree
   where
-    goDirTreePair :: FilePath -> DirTree Int64 -> Widget n
-    goDirTreePair fp = \case
-      NodeFile a -> str fp <+> str " " <+> goInt64 a
-      NodeDir df -> str fp <=> padLeft (Pad 2) (drawDirForest df)
-    drawDirForest :: DirForest Int64 -> Widget n
-    drawDirForest (DirForest m) = vBox $ map (uncurry goDirTreePair) $ M.toList m
-    goDirTreeCursorPair :: FilePath -> DirTreeCursor Int64 -> Widget n
-    goDirTreeCursorPair fp =
-      withAttr selectedAttr
-        . dirTreeCursorWidget
-          (\a -> str fp <+> str " " <+> goInt64 a)
-          ( \mdf -> case mdf of
-              Nothing -> str fp
-              Just df -> str fp <=> drawDirForestInt64Cursor df
-          )
-    goKeySelected fp = \case
-      NodeFile a -> withAttr selectedAttr (str fp) <+> str " " <+> goInt64 a
-      NodeDir df -> withAttr selectedAttr (str fp) <=> padLeft (Pad 2) (drawDirForest df)
-    goValueSelected fp dfc = str fp <=> padLeft (Pad 2) (drawDirForestInt64Cursor dfc)
-    goKVC = keyValueWidget goKeySelected goValueSelected
-    goInt64 i = str (show i) <+> str " bytes"
+    goFod :: FileOrDir Int64 -> Widget n
+    goFod = \case
+      FodFile rf i -> withDefAttr fileAttr $ str $ fromRelFile rf <> " " <> show i <> " bytes"
+      FodDir rd -> withDefAttr dirAttr $ str $ fromRelDir rd
+    goTree :: Tree (FileOrDir Int64) -> Widget n
+    goTree (Node fod f) = goFod fod <=> padLeft (Pad 2) (goForest f)
+    goForest :: Forest (FileOrDir Int64) -> Widget n
+    goForest = vBox . map goTree
+    goCTree :: CTree (FileOrDir Int64) -> Widget n
+    goCTree (CNode fod cf) = goFod fod <=> padLeft (Pad 2) (goCForest cf)
+    goCForest :: CForest (FileOrDir Int64) -> Widget n
+    goCForest = \case
+      EmptyCForest -> emptyWidget
+      ClosedForest net -> vBox $ map goTree $ NE.toList net
+      OpenForest nect -> vBox $ map goCTree $ NE.toList nect
+    goTC :: TreeCursor (FileOrDir Int64) -> Widget n
+    goTC = treeCursorWidget wrap cur
+      where
+        wrap :: [CTree (FileOrDir Int64)] -> FileOrDir Int64 -> [CTree (FileOrDir Int64)] -> Widget n -> Widget n
+        wrap lefts above rights cur = goFod above <=> padLeft (Pad 2) (vBox $ concat [map goCTree lefts, [cur], map goCTree rights])
+        cur :: FileOrDir Int64 -> CForest (FileOrDir Int64) -> Widget n
+        cur fod cf = withAttr selectedAttr (goFod fod) <=> padLeft (Pad 2) (goCForest cf)
 
 handleTuiEvent :: TuiState -> BrickEvent n e -> EventM n (Next TuiState)
 handleTuiEvent s e =
@@ -115,6 +133,9 @@ handleTuiEvent s e =
             EvKey (KChar 'k') [] -> doM dirForestCursorSelectPrevOnSameLevel
             EvKey (KChar 'g') [] -> doP dirForestCursorSelectFirstOnSameLevel
             EvKey (KChar 'G') [] -> doP dirForestCursorSelectLastOnSameLevel
+            EvKey (KChar 'p') [] -> doM dirForestCursorSelectParent
+            EvKey KLeft [] -> doM dirForestCursorSelectParent
+            EvKey KRight [] -> doM dirForestCursorSelectLastChild
             EvKey KDown [] -> doM dirForestCursorSelectNextOnSameLevel
             EvKey KUp [] -> doM dirForestCursorSelectPrevOnSameLevel
             _ -> continue s

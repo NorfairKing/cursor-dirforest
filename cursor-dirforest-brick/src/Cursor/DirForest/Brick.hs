@@ -5,7 +5,6 @@
 module Cursor.DirForest.Brick
   ( verticalDirForestCursorWidget,
     dirForestCursorWidget,
-    dirTreeCursorWidget,
   )
 where
 
@@ -15,7 +14,7 @@ import Brick.Types
 import Brick.Widgets.Core
 import Cursor.Brick
 import Cursor.DirForest
-import Cursor.Map
+import Cursor.Tree
 import qualified Data.DirForest as DF
 import Data.DirForest (DirForest (..), DirTree (..))
 import Data.Int
@@ -23,21 +22,18 @@ import qualified Data.Map as M
 import Graphics.Vty.Input.Events
 
 verticalDirForestCursorWidget ::
-  (FilePath -> DirTree a -> Widget n) ->
-  (KeyValueCursor FilePath (DirForestCursor a) FilePath (DirTree a) -> Widget n) ->
-  (FilePath -> DirTree a -> Widget n) ->
-  DirForestCursor a ->
+  (CTree (FileOrDir b) -> Widget n) ->
+  (TreeCursor (FileOrDir a) (FileOrDir b) -> Widget n) ->
+  (CTree (FileOrDir b) -> Widget n) ->
+  DirForestCursor a b ->
   Widget n
 verticalDirForestCursorWidget beforeFunc currentFunc afterFunc = dirForestCursorWidget $ \befores current afters ->
   vBox $
     concat
-      [ map (uncurry beforeFunc) befores,
+      [ map beforeFunc befores,
         [currentFunc current],
-        map (uncurry afterFunc) afters
+        map afterFunc afters
       ]
 
-dirForestCursorWidget :: ([(FilePath, DirTree a)] -> KeyValueCursor FilePath (DirForestCursor a) FilePath (DirTree a) -> [(FilePath, DirTree a)] -> Widget n) -> DirForestCursor a -> Widget n
+dirForestCursorWidget :: ([CTree (FileOrDir b)] -> TreeCursor (FileOrDir a) (FileOrDir b) -> [CTree (FileOrDir b)] -> Widget n) -> DirForestCursor a b -> Widget n
 dirForestCursorWidget = foldDirForestCursor
-
-dirTreeCursorWidget :: (a -> Widget n) -> (Maybe (DirForestCursor a) -> Widget n) -> (DirTreeCursor a -> Widget n)
-dirTreeCursorWidget = foldDirTreeCursor

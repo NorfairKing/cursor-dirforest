@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 46d0f802aafa673dd971d16f18b859cac99a1acffcebf790f62172a4ed2ff10a
+-- hash: ae162df9fa307117fca999ea5d3e229798fc70e8d8f941553eb1700c1401ce81
 
 name:           cursor-dirforest
 version:        0.0.0.0
@@ -20,6 +20,7 @@ source-repository head
 library
   exposed-modules:
       Cursor.DirForest
+      Cursor.Simple.DirForest
   other-modules:
       Paths_cursor_dirforest
   hs-source-dirs:
