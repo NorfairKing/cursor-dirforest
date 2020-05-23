@@ -14,5 +14,7 @@ library:
   - cursor
   - deepseq
   - dirforest
+  - filepath
   - microlens
+  - path
   - validity
