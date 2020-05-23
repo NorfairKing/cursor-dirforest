@@ -34,6 +34,7 @@ module Cursor.DirForest
     dirForestCursorSelectLastTreeOnSameLevel,
     dirForestCursorSelectFirstChild,
     dirForestCursorSelectLastChild,
+    dirForestCursorSelectParent,
     dirTreeCursorSelectFirstChild,
     dirTreeCursorSelectLastChild,
   )
@@ -166,6 +167,11 @@ dirForestCursorSelectLastChild = dirForestCursorMapCursorL . mapCursorElemL $ \k
     NodeDir df -> KeyValueCursorValue (makeKeyCursor fp) . dirForestCursorSelectLastOnSameLevel <$> makeDirForestCursor df
   KeyValueCursorValue fp dfc ->
     KeyValueCursorValue fp <$> dirForestCursorSelectFirstChild dfc
+
+dirForestCursorSelectParent :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectParent = dirForestCursorMapCursorL . mapCursorElemL $ \kvc -> case kvc of
+  KeyValueCursorKey _ _ -> Just kvc
+  KeyValueCursorValue fp dfc -> undefined
 
 dirTreeCursorSelectFirstChild :: DirTreeCursor a -> Maybe (DirTreeCursor a)
 dirTreeCursorSelectFirstChild = \case

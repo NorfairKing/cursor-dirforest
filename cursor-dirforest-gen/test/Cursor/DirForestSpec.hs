@@ -66,6 +66,10 @@ spec = modifyMaxShrinks (const 0) $ do
   describe "dirForestCursorSelectLastChild" $ forestMovementMSpec dirForestCursorSelectLastChild
   describe "dirTreeCursorSelectFirstChild" $ treeMovementMSpec dirTreeCursorSelectFirstChild
   describe "dirTreeCursorSelectLastChild" $ treeMovementMSpec dirTreeCursorSelectLastChild
+  describe "dirForestCursorSelectParent" $ do
+    it "produces valid cursors" $ producesValidsOnValids (dirForestCursorSelectParent @Word8)
+    it "is the inverse of dirForestCursorSelectFirstChild" $ inverseFunctionsIfSucceedOnValid dirForestCursorSelectFirstChild (dirForestCursorSelectParent @Word8)
+    it "is the inverse of dirForestCursorSelectLastChild" $ inverseFunctionsIfSucceedOnValid dirForestCursorSelectLastChild (dirForestCursorSelectParent @Word8)
 
 inverseMovementsSpec ::
   (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DirForestCursor a) ->
