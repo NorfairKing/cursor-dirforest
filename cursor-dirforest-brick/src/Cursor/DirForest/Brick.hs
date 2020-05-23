@@ -24,7 +24,7 @@ import Graphics.Vty.Input.Events
 
 verticalDirForestCursorWidget ::
   (FilePath -> DirTree a -> Widget n) ->
-  (KeyValueCursor FilePath (Maybe (DirForestCursor a)) FilePath (DirTree a) -> Widget n) ->
+  (KeyValueCursor FilePath (DirForestCursor a) FilePath (DirTree a) -> Widget n) ->
   (FilePath -> DirTree a -> Widget n) ->
   DirForestCursor a ->
   Widget n
@@ -36,7 +36,7 @@ verticalDirForestCursorWidget beforeFunc currentFunc afterFunc = dirForestCursor
         map (uncurry afterFunc) afters
       ]
 
-dirForestCursorWidget :: ([(FilePath, DirTree a)] -> KeyValueCursor FilePath (Maybe (DirForestCursor a)) FilePath (DirTree a) -> [(FilePath, DirTree a)] -> Widget n) -> DirForestCursor a -> Widget n
+dirForestCursorWidget :: ([(FilePath, DirTree a)] -> KeyValueCursor FilePath (DirForestCursor a) FilePath (DirTree a) -> [(FilePath, DirTree a)] -> Widget n) -> DirForestCursor a -> Widget n
 dirForestCursorWidget = foldDirForestCursor
 
 dirTreeCursorWidget :: (a -> Widget n) -> (Maybe (DirForestCursor a) -> Widget n) -> (DirTreeCursor a -> Widget n)

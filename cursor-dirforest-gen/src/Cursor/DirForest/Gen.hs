@@ -18,8 +18,8 @@ import Path
 import qualified System.FilePath as FP
 import Test.QuickCheck
 
-instance (Show a, GenValid a, Ord a) => GenValid (DirForestCursor a) where
-  shrinkValid = traceShowId . shrinkValidStructurally
+instance (GenValid a, Ord a) => GenValid (DirForestCursor a) where
+  shrinkValid = shrinkValidStructurally
   genValid = DirForestCursor <$> genMapCursorByDependent go1 go2 go3
     where
       isTopLevel p_ = parent p_ == [reldir|./|]
@@ -33,14 +33,14 @@ instance (Show a, GenValid a, Ord a) => GenValid (DirForestCursor a) where
           NodeFile _ -> fromRelFile <$> (genValid `suchThat` isTopLevel)
           NodeDir _ -> (FP.dropTrailingPathSeparator . fromRelDir) <$> (genValid `suchThat` isTopLevel)
         pure (fp, dt)
-      go2 :: Gen (FilePath, Maybe (DirForestCursor a))
+      go2 :: Gen (FilePath, DirForestCursor a)
       go2 = sized $ \s -> do
         (a, b) <- genSplit s
         mdfc <- resize a genValid
         fp <- resize b $ FP.dropTrailingPathSeparator . fromRelDir <$> (genValid `suchThat` isTopLevel)
         pure (fp, mdfc)
 
-instance (Show a, GenValid a, Ord a) => GenValid (DirTreeCursor a) where
+instance (GenValid a, Ord a) => GenValid (DirTreeCursor a) where
   shrinkValid = shrinkValidStructurally
   genValid = sized $ \n ->
     scale (\x -> max 0 $ x - 1) $

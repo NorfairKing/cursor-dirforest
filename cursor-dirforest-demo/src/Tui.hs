@@ -91,7 +91,7 @@ drawDirForestInt64Cursor =
     goKeySelected fp = \case
       NodeFile a -> withAttr selectedAttr (str fp) <+> str " " <+> goInt64 a
       NodeDir df -> withAttr selectedAttr (str fp) <=> padLeft (Pad 2) (drawDirForest df)
-    goValueSelected fp mdfc = str fp <=> maybe emptyWidget (padLeft (Pad 2) . drawDirForestInt64Cursor) mdfc
+    goValueSelected fp dfc = str fp <=> padLeft (Pad 2) (drawDirForestInt64Cursor dfc)
     goKVC = keyValueWidget goKeySelected goValueSelected
     goInt64 i = str (show i) <+> str " bytes"
 
