@@ -36,13 +36,11 @@ instance (GenValid a, Ord a) => GenValid (DirForestCursor a) where
           NodeFile _ -> fromRelFile <$> (genValid `suchThat` isTopLevel)
           NodeDir _ -> (FP.dropTrailingPathSeparator . fromRelDir) <$> (genValid `suchThat` isTopLevel)
         pure (fp, dt)
-      go2 :: Gen (FilePath, DirTreeCursor a)
+      go2 :: Gen (FilePath, Maybe (DirForestCursor a))
       go2 = do
-        dtc <- genValid
-        fp <- case dtc of
-          DirTreeCursorFile _ -> fromRelFile <$> (genValid `suchThat` isTopLevel)
-          DirTreeCursorDir _ -> (FP.dropTrailingPathSeparator . fromRelDir) <$> (genValid `suchThat` isTopLevel)
-        pure (fp, dtc)
+        mdfc <- genValid
+        fp <- FP.dropTrailingPathSeparator . fromRelDir <$> (genValid `suchThat` isTopLevel)
+        pure (fp, mdfc)
 
 instance (GenValid a, Ord a) => GenValid (DirTreeCursor a) where
   shrinkValid = shrinkValidStructurally

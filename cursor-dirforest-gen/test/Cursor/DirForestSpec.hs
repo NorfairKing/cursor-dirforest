@@ -12,11 +12,12 @@ import Cursor.DirForest.Gen ()
 import Data.DirForest (DirForest (..), DirTree (..))
 import qualified Data.DirForest as DF
 import Test.Hspec
+import Test.Hspec.QuickCheck
 import Test.Validity
 import Test.Validity.Optics
 
 spec :: Spec
-spec = do
+spec = modifyMaxShrinks (min 1000) $ do
   genValidSpec @(DirForestCursor Int)
   genValidSpec @(DirTreeCursor Int)
   xdescribe "Does not hold because of extra validity constraints" $ lensSpecOnValid (dirForestCursorMapCursorL @Int)
@@ -33,6 +34,8 @@ spec = do
   describe "rebuildDirTreeCursor" $ it "produces valid dirforests" $ producesValidsOnValids (rebuildDirTreeCursor @Int)
   describe "dirForestCursorSelectPrevOnSameLevel" $ forestMovementMSpec dirForestCursorSelectPrevOnSameLevel
   describe "dirForestCursorSelectNextOnSameLevel" $ forestMovementMSpec dirForestCursorSelectNextOnSameLevel
+  describe "dirForestCursorSelectFirstOnSameLevel" $ forestMovementSpec dirForestCursorSelectFirstOnSameLevel
+  describe "dirForestCursorSelectLastOnSameLevel" $ forestMovementSpec dirForestCursorSelectLastOnSameLevel
   describe "dirForestCursorSelectFirstChild" $ forestMovementMSpec dirForestCursorSelectFirstChild
   describe "dirForestCursorSelectLastChild" $ forestMovementMSpec dirForestCursorSelectLastChild
   describe "dirTreeCursorSelectFirstChild" $ treeMovementMSpec dirTreeCursorSelectFirstChild
@@ -45,6 +48,13 @@ forestMovementMSpec func = do
     case func @Int dfc of
       Nothing -> pure () -- Fine
       Just dfc' -> rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
+
+forestMovementSpec :: (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DirForestCursor a) -> Spec
+forestMovementSpec func = do
+  it "produces valid results" $ producesValidsOnValids (func @Int)
+  it "is a movement" $ forAllValid $ \dfc ->
+    let dfc' = func @Int dfc
+     in rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
 
 treeMovementMSpec :: (forall a. (Show a, Eq a, GenValid a) => DirTreeCursor a -> Maybe (DirTreeCursor a)) -> Spec
 treeMovementMSpec func = do

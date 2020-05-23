@@ -64,7 +64,7 @@ buildInitialState = do
 drawTui :: TuiState -> [Widget n]
 drawTui ts =
   let dfc = stateCursor ts
-   in [maybe emptyWidget drawDirForestInt64Cursor dfc, str (ppShow dfc)]
+   in [vBox [maybe emptyWidget drawDirForestInt64Cursor dfc, str (ppShow dfc)]]
 
 drawDirForestInt64Cursor :: DirForestCursor Int64 -> Widget n
 drawDirForestInt64Cursor =
@@ -91,8 +91,7 @@ drawDirForestInt64Cursor =
     goKeySelected fp = \case
       NodeFile a -> withAttr selectedAttr (str fp) <+> str " " <+> goInt64 a
       NodeDir df -> withAttr selectedAttr (str fp) <=> padLeft (Pad 2) (drawDirForest df)
-    goValueSelected fp dtc =
-      withAttr selectedAttr $ goDirTreeCursorPair fp dtc
+    goValueSelected fp mdfc = str fp <=> maybe emptyWidget (padLeft (Pad 2) . drawDirForestInt64Cursor) mdfc
     goKVC = keyValueWidget goKeySelected goValueSelected
     goInt64 i = str (show i) <+> str " bytes"
 

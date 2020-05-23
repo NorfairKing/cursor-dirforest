@@ -26,6 +26,8 @@ module Cursor.DirForest
     -- * Movements
     dirForestCursorSelectPrevOnSameLevel,
     dirForestCursorSelectNextOnSameLevel,
+    dirForestCursorSelectFirstOnSameLevel,
+    dirForestCursorSelectLastOnSameLevel,
     dirForestCursorSelectFirstChild,
     dirForestCursorSelectLastChild,
     dirTreeCursorSelectFirstChild,
@@ -73,14 +75,14 @@ instance (Validity a, Ord a) => Validity (DirTreeCursor a)
 
 instance (NFData a, Ord a) => NFData (DirTreeCursor a)
 
-dirForestCursorMapCursorL :: Lens' (DirForestCursor a) (MapCursor FilePath (DirTreeCursor a) FilePath (DirTree a))
+dirForestCursorMapCursorL :: Lens' (DirForestCursor a) (MapCursor FilePath (Maybe (DirForestCursor a)) FilePath (DirTree a))
 dirForestCursorMapCursorL = lens dirForestCursorMapCursor $ \dfc mc -> dfc {dirForestCursorMapCursor = mc}
 
 makeDirForestCursor :: DirForest a -> Maybe (DirForestCursor a)
 makeDirForestCursor (DirForest m) = fmap DirForestCursor $ makeMapCursor id <$> NE.nonEmpty (M.toList m)
 
 rebuildDirForestCursor :: DirForestCursor a -> DirForest a
-rebuildDirForestCursor (DirForestCursor mc) = DirForest $ M.fromList $ NE.toList $ rebuildMapCursor id rebuildDirTreeCursor mc
+rebuildDirForestCursor (DirForestCursor mc) = DirForest $ M.fromList $ NE.toList $ rebuildMapCursor id rebuildValueCursor mc
 
 makeDirTreeCursor :: DirTree a -> DirTreeCursor a
 makeDirTreeCursor = \case
@@ -92,7 +94,7 @@ rebuildDirTreeCursor = \case
   DirTreeCursorFile a -> NodeFile a
   DirTreeCursorDir dfc -> NodeDir $ maybe DF.empty rebuildDirForestCursor dfc
 
-foldDirForestCursor :: ([(FilePath, DirTree a)] -> KeyValueCursor FilePath (DirTreeCursor a) FilePath (DirTree a) -> [(FilePath, DirTree a)] -> c) -> DirForestCursor a -> c
+foldDirForestCursor :: ([(FilePath, DirTree a)] -> KeyValueCursor FilePath (Maybe (DirForestCursor a)) FilePath (DirTree a) -> [(FilePath, DirTree a)] -> c) -> DirForestCursor a -> c
 foldDirForestCursor func (DirForestCursor m) = foldMapCursor func m
 
 foldDirTreeCursor :: (a -> b) -> (Maybe (DirForestCursor a) -> b) -> DirTreeCursor a -> b
@@ -101,22 +103,34 @@ foldDirTreeCursor fileFunc dirFunc = \case
   DirTreeCursorDir mdf -> dirFunc mdf
 
 dirForestCursorSelectPrevOnSameLevel :: DirForestCursor a -> Maybe (DirForestCursor a)
-dirForestCursorSelectPrevOnSameLevel = dirForestCursorMapCursorL $ mapCursorSelectPrev rebuildKeyCursor makeKeyCursor rebuildDirTreeCursor
+dirForestCursorSelectPrevOnSameLevel = dirForestCursorMapCursorL $ mapCursorSelectPrev rebuildKeyCursor makeKeyCursor rebuildValueCursor
 
 dirForestCursorSelectNextOnSameLevel :: DirForestCursor a -> Maybe (DirForestCursor a)
-dirForestCursorSelectNextOnSameLevel = dirForestCursorMapCursorL $ mapCursorSelectNext rebuildKeyCursor makeKeyCursor rebuildDirTreeCursor
+dirForestCursorSelectNextOnSameLevel = dirForestCursorMapCursorL $ mapCursorSelectNext rebuildKeyCursor makeKeyCursor rebuildValueCursor
+
+dirForestCursorSelectFirstOnSameLevel :: DirForestCursor a -> DirForestCursor a
+dirForestCursorSelectFirstOnSameLevel = dirForestCursorMapCursorL %~ mapCursorSelectFirst rebuildKeyCursor makeKeyCursor rebuildValueCursor
+
+dirForestCursorSelectLastOnSameLevel :: DirForestCursor a -> DirForestCursor a
+dirForestCursorSelectLastOnSameLevel = dirForestCursorMapCursorL %~ mapCursorSelectLast rebuildKeyCursor makeKeyCursor rebuildValueCursor
 
 dirForestCursorSelectFirstChild :: DirForestCursor a -> Maybe (DirForestCursor a)
-dirForestCursorSelectFirstChild =
-  dirForestCursorMapCursorL $
-    (mapCursorTraverseValueCase (\fp dtc -> (,) fp <$> dirTreeCursorSelectFirstChild dtc))
-      . (mapCursorSelectValue rebuildKeyCursor makeDirTreeCursor)
+dirForestCursorSelectFirstChild = dirForestCursorMapCursorL . mapCursorElemL $ \kvc -> case kvc of
+  KeyValueCursorKey fp dt -> case dt of
+    NodeFile _ -> Nothing
+    NodeDir df -> Just $ KeyValueCursorValue (makeKeyCursor fp) (dirForestCursorSelectFirstOnSameLevel <$> makeDirForestCursor df)
+  KeyValueCursorValue fp mdfc -> case mdfc of
+    Nothing -> Nothing
+    Just dfc -> KeyValueCursorValue fp . Just <$> dirForestCursorSelectFirstChild dfc
 
 dirForestCursorSelectLastChild :: DirForestCursor a -> Maybe (DirForestCursor a)
-dirForestCursorSelectLastChild =
-  dirForestCursorMapCursorL $
-    (mapCursorTraverseValueCase (\fp dtc -> (,) fp <$> dirTreeCursorSelectLastChild dtc))
-      . (mapCursorSelectValue rebuildKeyCursor makeDirTreeCursor)
+dirForestCursorSelectLastChild = dirForestCursorMapCursorL . mapCursorElemL $ \kvc -> case kvc of
+  KeyValueCursorKey fp dt -> case dt of
+    NodeFile _ -> Nothing
+    NodeDir df -> Just $ KeyValueCursorValue (makeKeyCursor fp) (dirForestCursorSelectLastOnSameLevel <$> makeDirForestCursor df)
+  KeyValueCursorValue fp mdfc -> case mdfc of
+    Nothing -> Nothing
+    Just dfc -> KeyValueCursorValue fp . Just <$> dirForestCursorSelectFirstChild dfc
 
 dirTreeCursorSelectFirstChild :: DirTreeCursor a -> Maybe (DirTreeCursor a)
 dirTreeCursorSelectFirstChild = \case
@@ -137,3 +151,6 @@ makeKeyCursor = id
 
 rebuildKeyCursor :: FilePath -> FilePath
 rebuildKeyCursor = id
+
+rebuildValueCursor :: Maybe (DirForestCursor a) -> DirTree a
+rebuildValueCursor = NodeDir . maybe DF.empty rebuildDirForestCursor
