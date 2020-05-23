@@ -32,6 +32,8 @@ module Cursor.DirForest
     dirForestCursorSelectNextTree,
     dirForestCursorSelectFirstTree,
     dirForestCursorSelectLastTree,
+    dirForestCursorSelectPrev,
+    dirForestCursorSelectNext,
     dirForestCursorSelectFirstChild,
     dirForestCursorSelectLastChild,
     dirForestCursorSelectParent,
@@ -208,6 +210,12 @@ dirForestCursorSelectFirstTree f g = dirForestCursorForestCursorL %~ forestCurso
 
 dirForestCursorSelectLastTree :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DirForestCursor a b
 dirForestCursorSelectLastTree f g = dirForestCursorForestCursorL %~ forestCursorSelectLastTreeCursor (fmap f) (fmap g)
+
+dirForestCursorSelectPrev :: (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorSelectPrev f g = dirForestCursorForestCursorL $ forestCursorSelectPrev (fmap f) (fmap g)
+
+dirForestCursorSelectNext :: (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorSelectNext f g = dirForestCursorForestCursorL $ forestCursorSelectNext (fmap f) (fmap g)
 
 dirForestCursorSelectFirstChild :: (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorSelectFirstChild f g = dirForestCursorForestCursorL $ forestCursorSelectBelowAtStart (fmap f) (fmap g)

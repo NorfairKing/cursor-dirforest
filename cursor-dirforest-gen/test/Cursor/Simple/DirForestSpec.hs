@@ -56,6 +56,8 @@ spec = modifyMaxShrinks (const 0) $ do
   describe "dirForestCursorSelectLastOnSameLevel" $ forestMovementSpec dirForestCursorSelectLastOnSameLevel
   xdescribe "is not true because of ordering of files in the map" $ describe "dirForestCursorSelectFirstOnSameLevel and dirForestCursorSelectLastOnSameLevel" $ do
     inverseMovementsSpec dirForestCursorSelectFirstOnSameLevel dirForestCursorSelectLastOnSameLevel
+  describe "dirForestCursorSelectPrev" $ forestMovementMSpec dirForestCursorSelectPrev
+  describe "dirForestCursorSelectNext" $ forestMovementMSpec dirForestCursorSelectNext
   describe "dirForestCursorSelectFirstChild" $ forestMovementMSpec dirForestCursorSelectFirstChild
   describe "dirForestCursorSelectLastChild" $ forestMovementMSpec dirForestCursorSelectLastChild
   describe "dirForestCursorSelectParent" $ do

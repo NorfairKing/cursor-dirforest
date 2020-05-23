@@ -32,6 +32,8 @@ module Cursor.Simple.DirForest
     dirForestCursorSelectNextTree,
     dirForestCursorSelectFirstTree,
     dirForestCursorSelectLastTree,
+    dirForestCursorSelectPrev,
+    dirForestCursorSelectNext,
     dirForestCursorSelectFirstChild,
     dirForestCursorSelectLastChild,
     dirForestCursorSelectParent,
@@ -75,6 +77,12 @@ dirForestCursorSelectFirstTree = DFC.dirForestCursorSelectFirstTree id id
 
 dirForestCursorSelectLastTree :: DirForestCursor a -> DirForestCursor a
 dirForestCursorSelectLastTree = DFC.dirForestCursorSelectLastTree id id
+
+dirForestCursorSelectPrev :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectPrev = DFC.dirForestCursorSelectPrev id id
+
+dirForestCursorSelectNext :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectNext = DFC.dirForestCursorSelectNext id id
 
 dirForestCursorSelectFirstChild :: DirForestCursor a -> Maybe (DirForestCursor a)
 dirForestCursorSelectFirstChild = DFC.dirForestCursorSelectFirstChild id id

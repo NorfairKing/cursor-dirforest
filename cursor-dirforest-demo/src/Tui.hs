@@ -129,14 +129,14 @@ handleTuiEvent s e =
             EvKey (KChar 'q') [] -> halt s
             EvKey (KChar 'f') [] -> doM dirForestCursorSelectFirstChild
             EvKey (KChar 'l') [] -> doM dirForestCursorSelectLastChild
-            EvKey (KChar 'j') [] -> doM dirForestCursorSelectNextOnSameLevel
-            EvKey (KChar 'k') [] -> doM dirForestCursorSelectPrevOnSameLevel
+            EvKey (KChar 'j') [] -> doM dirForestCursorSelectNext
+            EvKey (KChar 'k') [] -> doM dirForestCursorSelectPrev
             EvKey (KChar 'g') [] -> doP dirForestCursorSelectFirstOnSameLevel
             EvKey (KChar 'G') [] -> doP dirForestCursorSelectLastOnSameLevel
             EvKey (KChar 'p') [] -> doM dirForestCursorSelectParent
             EvKey KLeft [] -> doM dirForestCursorSelectParent
             EvKey KRight [] -> doM dirForestCursorSelectLastChild
-            EvKey KDown [] -> doM dirForestCursorSelectNextOnSameLevel
-            EvKey KUp [] -> doM dirForestCursorSelectPrevOnSameLevel
+            EvKey KDown [] -> doM dirForestCursorSelectNext
+            EvKey KUp [] -> doM dirForestCursorSelectPrev
             _ -> continue s
     _ -> continue s
