@@ -37,6 +37,17 @@ module Cursor.Simple.DirForest
     dirForestCursorSelectFirstChild,
     dirForestCursorSelectLastChild,
     dirForestCursorSelectParent,
+
+    -- * Collapsing
+
+    -- ** One level
+    DFC.dirForestCursorOpen,
+    DFC.dirForestCursorClose,
+    DFC.dirForestCursorToggle,
+
+    -- ** Recursively
+    DFC.dirForestCursorOpenRecursively,
+    DFC.dirForestCursorToggleRecursively,
   )
 where
 

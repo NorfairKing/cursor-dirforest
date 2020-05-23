@@ -37,6 +37,17 @@ module Cursor.DirForest
     dirForestCursorSelectFirstChild,
     dirForestCursorSelectLastChild,
     dirForestCursorSelectParent,
+
+    -- * Collapsing
+
+    -- ** One level
+    dirForestCursorOpen,
+    dirForestCursorClose,
+    dirForestCursorToggle,
+
+    -- ** Recursively
+    dirForestCursorOpenRecursively,
+    dirForestCursorToggleRecursively,
   )
 where
 
@@ -159,7 +170,7 @@ dirForestCursorForestCursorL = lens dirForestCursorForestCursor $ \dfc mc -> dfc
 --
 -- This will fail if the dirforest is empty.
 makeDirForestCursor :: (b -> a) -> DirForest b -> Maybe (DirForestCursor a b)
-makeDirForestCursor func = fmap (DirForestCursor . makeForestCursor (fmap func) . NE.map (cTree True)) . NE.nonEmpty . toForest
+makeDirForestCursor func = fmap (DirForestCursor . makeForestCursor (fmap func) . NE.map makeCTree) . NE.nonEmpty . toForest
   where
     toForest :: DirForest b -> Forest (FileOrDir b)
     toForest = goDF
@@ -183,6 +194,9 @@ rebuildDirForestCursor func = fromForest . NE.toList . NE.map rebuildCTree . reb
         goT (Node fod f) = case fod of
           FodFile rf v -> (fromRelFile rf, NodeFile v)
           FodDir rd -> (FP.dropTrailingPathSeparator $ fromRelDir rd, NodeDir $ goF f)
+
+isTopLevel :: Path Rel t -> Bool
+isTopLevel p_ = parent p_ == [reldir|./|]
 
 foldDirForestCursor :: ([CTree (FileOrDir b)] -> TreeCursor (FileOrDir a) (FileOrDir b) -> [CTree (FileOrDir b)] -> c) -> DirForestCursor a b -> c
 foldDirForestCursor func (DirForestCursor fc) = foldForestCursor func fc
@@ -226,5 +240,17 @@ dirForestCursorSelectLastChild f g = dirForestCursorForestCursorL $ forestCursor
 dirForestCursorSelectParent :: (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorSelectParent f g = dirForestCursorForestCursorL $ forestCursorSelectAbove (fmap f) (fmap g)
 
-isTopLevel :: Path Rel t -> Bool
-isTopLevel p_ = parent p_ == [reldir|./|]
+dirForestCursorOpen :: DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorOpen = dirForestCursorForestCursorL forestCursorOpenCurrentForest
+
+dirForestCursorClose :: DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorClose = dirForestCursorForestCursorL forestCursorCloseCurrentForest
+
+dirForestCursorToggle :: DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorToggle = dirForestCursorForestCursorL forestCursorToggleCurrentForest
+
+dirForestCursorOpenRecursively :: DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorOpenRecursively = dirForestCursorForestCursorL forestCursorOpenCurrentForestRecursively
+
+dirForestCursorToggleRecursively :: DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorToggleRecursively = dirForestCursorForestCursorL forestCursorToggleCurrentForestRecursively

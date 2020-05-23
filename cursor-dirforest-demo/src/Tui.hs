@@ -103,7 +103,7 @@ drawDirForestInt64Cursor =
     goCForest :: CForest (FileOrDir Int64) -> Widget n
     goCForest = \case
       EmptyCForest -> emptyWidget
-      ClosedForest net -> vBox $ map goTree $ NE.toList net
+      ClosedForest _ -> emptyWidget
       OpenForest nect -> vBox $ map goCTree $ NE.toList nect
     goTC :: TreeCursor (FileOrDir Int64) -> Widget n
     goTC = treeCursorWidget wrap cur
@@ -138,5 +138,6 @@ handleTuiEvent s e =
             EvKey KRight [] -> doM dirForestCursorSelectLastChild
             EvKey KDown [] -> doM dirForestCursorSelectNext
             EvKey KUp [] -> doM dirForestCursorSelectPrev
+            EvKey (KChar '\t') [] -> doM dirForestCursorToggle
             _ -> continue s
     _ -> continue s
