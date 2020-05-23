@@ -1,3 +1,4 @@
+{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
@@ -11,15 +12,27 @@ import Cursor.DirForest
 import Cursor.DirForest.Gen ()
 import Data.DirForest (DirForest (..), DirTree (..))
 import qualified Data.DirForest as DF
+import Debug.Trace
+import Path
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.Validity
 import Test.Validity.Optics
+import Test.Validity.Shrinking
 
 spec :: Spec
-spec = modifyMaxShrinks (min 1000) $ do
-  genValidSpec @(DirForestCursor Int)
+spec = modifyMaxShrinks (const 0) $ do
   genValidSpec @(DirTreeCursor Int)
+  -- shrinkValidSpecWithLimit @(DirTreeCursor Int) 1
+  -- No shrinking until I figure out what the problem is
+  genValidSpec @(DirForestCursor Int)
+  describe "shrinkValid DirForestCursor" $ do
+    it "does not shrink the singleton dirforest cursor to itself" $
+      let df = DF.singleton [relfile|a|] 'a'
+       in shrinkValid df `shouldNotSatisfy` (elem df)
+  -- it "does not shrink a value to itself" $ do
+  --   shrinkValidDoesNotShrinkToItselfWithLimit @(DirForestCursor Int) 1
+  -- shrinkValidSpecWithLimit @(DirForestCursor Int) 1
   xdescribe "Does not hold because of extra validity constraints" $ lensSpecOnValid (dirForestCursorMapCursorL @Int)
   describe "makeDirForestCursor" $ do
     it "works for an empty dirforest" $ do
@@ -34,8 +47,18 @@ spec = modifyMaxShrinks (min 1000) $ do
   describe "rebuildDirTreeCursor" $ it "produces valid dirforests" $ producesValidsOnValids (rebuildDirTreeCursor @Int)
   describe "dirForestCursorSelectPrevOnSameLevel" $ forestMovementMSpec dirForestCursorSelectPrevOnSameLevel
   describe "dirForestCursorSelectNextOnSameLevel" $ forestMovementMSpec dirForestCursorSelectNextOnSameLevel
+  describe "dirForestCursorSelectPrevOnSameLevel and dirForestCursorSelectNextOnSameLevel" $ do
+    it "are inverses starting with Prev" $
+      inverseFunctionsIfSucceedOnValid (dirForestCursorSelectPrevOnSameLevel @Int . traceShowId) (dirForestCursorSelectNextOnSameLevel . traceShowId)
+    it "are inverses starting with Next" $
+      inverseFunctionsIfSucceedOnValid (dirForestCursorSelectNextOnSameLevel @Int) dirForestCursorSelectPrevOnSameLevel
   describe "dirForestCursorSelectFirstOnSameLevel" $ forestMovementSpec dirForestCursorSelectFirstOnSameLevel
   describe "dirForestCursorSelectLastOnSameLevel" $ forestMovementSpec dirForestCursorSelectLastOnSameLevel
+  describe "dirForestCursorSelectFirstOnSameLevel and dirForestCursorSelectLastOnSameLevel" $ do
+    it "are inverses starting with First" $
+      inverseFunctionsOnValid (dirForestCursorSelectFirstOnSameLevel @Int . traceShowId) (dirForestCursorSelectLastOnSameLevel . traceShowId)
+    it "are inverses starting with Last" $
+      inverseFunctionsOnValid (dirForestCursorSelectLastOnSameLevel @Int) dirForestCursorSelectFirstOnSameLevel
   describe "dirForestCursorSelectFirstChild" $ forestMovementMSpec dirForestCursorSelectFirstChild
   describe "dirForestCursorSelectLastChild" $ forestMovementMSpec dirForestCursorSelectLastChild
   describe "dirTreeCursorSelectFirstChild" $ treeMovementMSpec dirTreeCursorSelectFirstChild

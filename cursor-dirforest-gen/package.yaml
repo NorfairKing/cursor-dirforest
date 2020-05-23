@@ -30,14 +30,15 @@ tests:
     - -with-rtsopts=-N
     - -Wall
     dependencies:
-    - dirforest
-    - hspec
-    - genvalidity-hspec
-    - genvalidity-hspec-optics
     - QuickCheck
-    - cursor-gen
     - cursor-dirforest
     - cursor-dirforest-gen
+    - cursor-gen
+    - dirforest
+    - genvalidity-hspec
+    - genvalidity-hspec-optics
+    - hspec
+    - path
 
 benchmarks:
   cursor-dirforest-bench:

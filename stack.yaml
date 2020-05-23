@@ -8,6 +8,39 @@ packages:
 - ../dirforest/genvalidity-dirforest
 - ../cursor/cursor
 - ../cursor/cursor-gen
+- ../validity/genvalidity
+- ../validity/genvalidity-aeson
+- ../validity/genvalidity-bytestring
+- ../validity/genvalidity-containers
+- ../validity/genvalidity-criterion
+- ../validity/genvalidity-hspec
+- ../validity/genvalidity-hspec-aeson
+- ../validity/genvalidity-hspec-binary
+- ../validity/genvalidity-hspec-cereal
+- ../validity/genvalidity-hspec-hashable
+- ../validity/genvalidity-hspec-optics
+- ../validity/genvalidity-hspec-persistent
+- ../validity/genvalidity-path
+- ../validity/genvalidity-property
+- ../validity/genvalidity-scientific
+- ../validity/genvalidity-text
+- ../validity/genvalidity-time
+- ../validity/genvalidity-unordered-containers
+- ../validity/genvalidity-uuid
+- ../validity/genvalidity-vector
+- ../validity/validity
+- ../validity/validity-aeson
+- ../validity/validity-bytestring
+- ../validity/validity-containers
+- ../validity/validity-path
+- ../validity/validity-primitive
+- ../validity/validity-scientific
+- ../validity/validity-text
+- ../validity/validity-time
+- ../validity/validity-unordered-containers
+- ../validity/validity-uuid
+- ../validity/validity-vector
+
 extra-deps:
 - cursor-brick-0.1.0.0
 # - github: NorfairKing/cursor
@@ -15,39 +48,39 @@ extra-deps:
 #   subdirs:
 #   - cursor
 #   - cursor-gen
-- github: NorfairKing/validity
-  commit: 3d5bccbaac055164311ca9d90b0ac7ff7f2c412c
-  subdirs:
-  - genvalidity
-  - genvalidity-aeson
-  - genvalidity-bytestring
-  - genvalidity-containers
-  - genvalidity-criterion
-  - genvalidity-hspec
-  - genvalidity-hspec-aeson
-  - genvalidity-hspec-binary
-  - genvalidity-hspec-cereal
-  - genvalidity-hspec-hashable
-  - genvalidity-hspec-optics
-  - genvalidity-hspec-persistent
-  - genvalidity-path
-  - genvalidity-property
-  - genvalidity-scientific
-  - genvalidity-text
-  - genvalidity-time
-  - genvalidity-unordered-containers
-  - genvalidity-uuid
-  - genvalidity-vector
-  - validity
-  - validity-aeson
-  - validity-bytestring
-  - validity-containers
-  - validity-path
-  - validity-primitive
-  - validity-scientific
-  - validity-text
-  - validity-time
-  - validity-unordered-containers
-  - validity-uuid
-  - validity-vector
+# - github: NorfairKing/validity
+#   commit: 3d5bccbaac055164311ca9d90b0ac7ff7f2c412c
+#   subdirs:
+#   - genvalidity
+#   - genvalidity-aeson
+#   - genvalidity-bytestring
+#   - genvalidity-containers
+#   - genvalidity-criterion
+#   - genvalidity-hspec
+#   - genvalidity-hspec-aeson
+#   - genvalidity-hspec-binary
+#   - genvalidity-hspec-cereal
+#   - genvalidity-hspec-hashable
+#   - genvalidity-hspec-optics
+#   - genvalidity-hspec-persistent
+#   - genvalidity-path
+#   - genvalidity-property
+#   - genvalidity-scientific
+#   - genvalidity-text
+#   - genvalidity-time
+#   - genvalidity-unordered-containers
+#   - genvalidity-uuid
+#   - genvalidity-vector
+#   - validity
+#   - validity-aeson
+#   - validity-bytestring
+#   - validity-containers
+#   - validity-path
+#   - validity-primitive
+#   - validity-scientific
+#   - validity-text
+#   - validity-time
+#   - validity-unordered-containers
+#   - validity-uuid
+#   - validity-vector
 

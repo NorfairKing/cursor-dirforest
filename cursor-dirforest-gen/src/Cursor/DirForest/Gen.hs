@@ -13,39 +13,37 @@ import qualified Data.DirForest as DF
 import Data.GenValidity
 import Data.GenValidity.Containers
 import Data.GenValidity.DirForest
+import Debug.Trace
 import Path
 import qualified System.FilePath as FP
 import Test.QuickCheck
 
-instance (GenValid a, Ord a) => GenValid (DirForestCursor a) where
-  shrinkValid = shrinkValidStructurally
+instance (Show a, GenValid a, Ord a) => GenValid (DirForestCursor a) where
+  shrinkValid = traceShowId . shrinkValidStructurally
   genValid = DirForestCursor <$> genMapCursorByDependent go1 go2 go3
     where
       isTopLevel p_ = parent p_ == [reldir|./|]
       go3 :: Gen (FilePath, DirTree a)
       go3 = go1
       go1 :: Gen (FilePath, DirTree a)
-      go1 = do
-        dt <-
-          genValid
-            `suchThat` ( \case
-                           NodeDir df -> not $ DF.null df
-                           _ -> True
-                       )
-        fp <- case dt of
+      go1 = sized $ \s -> do
+        (a, b) <- genSplit s
+        dt <- resize a genValid
+        fp <- resize b $ case dt of
           NodeFile _ -> fromRelFile <$> (genValid `suchThat` isTopLevel)
           NodeDir _ -> (FP.dropTrailingPathSeparator . fromRelDir) <$> (genValid `suchThat` isTopLevel)
         pure (fp, dt)
       go2 :: Gen (FilePath, Maybe (DirForestCursor a))
-      go2 = do
-        mdfc <- genValid
-        fp <- FP.dropTrailingPathSeparator . fromRelDir <$> (genValid `suchThat` isTopLevel)
+      go2 = sized $ \s -> do
+        (a, b) <- genSplit s
+        mdfc <- resize a genValid
+        fp <- resize b $ FP.dropTrailingPathSeparator . fromRelDir <$> (genValid `suchThat` isTopLevel)
         pure (fp, mdfc)
 
-instance (GenValid a, Ord a) => GenValid (DirTreeCursor a) where
+instance (Show a, GenValid a, Ord a) => GenValid (DirTreeCursor a) where
   shrinkValid = shrinkValidStructurally
   genValid = sized $ \n ->
-    scale (\x -> max x $ x - 1) $
+    scale (\x -> max 0 $ x - 1) $
       oneof
         [ DirTreeCursorFile <$> genValid,
           DirTreeCursorDir <$> genValid
