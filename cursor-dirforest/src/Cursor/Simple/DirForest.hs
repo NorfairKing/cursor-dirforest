@@ -20,9 +20,13 @@ module Cursor.Simple.DirForest
 
     -- ** Lenses
     DFC.dirForestCursorForestCursorL,
+    DFC.dirForestCursorSelectedL,
 
     -- ** Fold
     DFC.foldDirForestCursor,
+
+    -- * Query
+    DFC.dirForestCursorSelected,
 
     -- * Movements
     dirForestCursorSelectPrevOnSameLevel,

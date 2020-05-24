@@ -19,9 +19,13 @@ module Cursor.DirForest
 
     -- ** Lenses
     dirForestCursorForestCursorL,
+    dirForestCursorSelectedL,
 
     -- ** Fold
     foldDirForestCursor,
+
+    -- * Query
+    dirForestCursorSelected,
 
     -- * Movements
     dirForestCursorSelectPrevOnSameLevel,
@@ -165,6 +169,13 @@ instance NFData a => NFData (FileOrDir a)
 dirForestCursorForestCursorL :: Lens' (DirForestCursor a b) (ForestCursor (FileOrDir a) (FileOrDir b))
 dirForestCursorForestCursorL = lens dirForestCursorForestCursor $ \dfc mc -> dfc {dirForestCursorForestCursor = mc}
 
+-- | The selected 'FileOrDir'.
+--
+-- Note that its path will only be the last piece, not the entire path.
+-- If you need the entire piece, see 'dirForestCursorSelected' instead.
+dirForestCursorSelectedL :: Lens' (DirForestCursor a b) (FileOrDir a)
+dirForestCursorSelectedL = dirForestCursorForestCursorL . forestCursorSelectedTreeL . treeCursorCurrentL
+
 -- | Make a 'DirForestCursor'.
 --
 -- This will fail if the dirforest is empty.
@@ -199,6 +210,19 @@ isTopLevel p_ = parent p_ == [reldir|./|]
 
 foldDirForestCursor :: ([CTree (FileOrDir b)] -> TreeCursor (FileOrDir a) (FileOrDir b) -> [CTree (FileOrDir b)] -> c) -> DirForestCursor a b -> c
 foldDirForestCursor func (DirForestCursor fc) = foldForestCursor func fc
+
+dirForestCursorSelected :: DirForestCursor a b -> (Path Rel Dir, FileOrDir a)
+dirForestCursorSelected dfc =
+  let tc = dfc ^. dirForestCursorForestCursorL . forestCursorSelectedTreeL
+      goMAbove :: (Path Rel Dir, c) -> Maybe (TreeAbove (FileOrDir b)) -> (Path Rel Dir, c)
+      goMAbove fod = \case
+        Nothing -> fod
+        Just ta -> goAbove fod ta
+      goAbove :: (Path Rel Dir, c) -> TreeAbove (FileOrDir b) -> (Path Rel Dir, c)
+      goAbove (d, fod) ta = case treeAboveNode ta of
+        FodFile _ _ -> goMAbove (d, fod) (treeAboveAbove ta) -- Should never happen. Valid DirForestCursors disallow  this
+        FodDir rp -> goMAbove (rp </> d, fod) (treeAboveAbove ta)
+   in goMAbove ([reldir|./|], treeCurrent tc) (treeAbove tc)
 
 dirForestCursorSelectPrevOnSameLevel :: (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorSelectPrevOnSameLevel f g = dirForestCursorForestCursorL $ forestCursorSelectPrevOnSameLevel (fmap f) (fmap g)
