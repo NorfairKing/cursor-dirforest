@@ -1,0 +1,24 @@
+name: "Nix Build"
+on:
+  pull_request:
+  push:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v8
+    - uses: cachix/cachix-action@releases/v6
+      with:
+        name: validity
+    - uses: cachix/cachix-action@releases/v6
+      with:
+        name: cursor
+    - uses: cachix/cachix-action@releases/v6
+      with:
+        name: dirforest
+    - uses: cachix/cachix-action@releases/v6
+      with:
+        name: cursor-dirforest
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+    - run: nix-build
