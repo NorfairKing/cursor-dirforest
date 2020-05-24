@@ -27,7 +27,7 @@ cursorDirForestDemo = do
   endState <- defaultMain tuiApp initialState
   pPrint endState
 
-data TuiState
+newtype TuiState
   = TuiState {stateCursor :: Maybe (DirForestCursor Int64)}
   deriving (Show, Eq)
 

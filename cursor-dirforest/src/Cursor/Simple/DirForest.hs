@@ -1,8 +1,3 @@
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE QuasiQuotes #-}
-
 module Cursor.Simple.DirForest
   ( -- * Types
     DirForestCursor,

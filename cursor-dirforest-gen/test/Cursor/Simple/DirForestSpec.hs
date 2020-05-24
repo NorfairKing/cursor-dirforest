@@ -24,24 +24,25 @@ spec = modifyMaxShrinks (const 0) $ do
   describe "shrinkValid DirForestCursor" $ do
     it "does not shrink the singletonFile dirforest cursor to itself" $
       let df = makeDirForestCursor $ DF.singletonFile [relfile|a|] 'a'
-       in shrinkValid df `shouldNotSatisfy` (elem df)
+       in shrinkValid df `shouldNotSatisfy` elem df
     it "does not shrink the singletonDir dirforest cursor to itself" $
       let df = makeDirForestCursor $ DF.singletonDir [reldir|a|] :: Maybe (DirForestCursor Char)
-       in shrinkValid df `shouldNotSatisfy` (elem df)
+       in shrinkValid df `shouldNotSatisfy` elem df
   -- it "does not shrink a value to itself" $ do
   --   shrinkValidDoesNotShrinkToItselfWithLimit @(DirForestCursor Word8) 1
   -- shrinkValidSpecWithLimit @(DirForestCursor Word8) 1
   -- xdescribe "Does not hold because of extra validity constraints" $ lensSpecOnValid (dirForestCursorMapCursorL @Word8)
   describe "makeDirForestCursor" $ do
-    it "works for an empty dirforest" $ do
-      shouldBeValid $ makeDirForestCursor (DF.empty @Word8)
+    it "works for an empty dirforest"
+      $ shouldBeValid
+      $ makeDirForestCursor (DF.empty @Word8)
     it "produces valid cursors" $ producesValidsOnValids (makeDirForestCursor @Word8)
   describe "rebuildDirForestCursor" $ do
     it "produces valid dirforests" $ producesValidsOnValids (rebuildDirForestCursor @Word8)
     it "is the inverse of 'makeDirForestCursor'" $ inverseFunctionsIfFirstSucceedsOnValid (makeDirForestCursor @Word8) (rebuildDirForestCursor @Word8)
   describe "dirForestCursorSelectPrevTree" $ forestMovementMSpec dirForestCursorSelectPrevTree
   describe "dirForestCursorSelectNextTree" $ forestMovementMSpec dirForestCursorSelectNextTree
-  xdescribe "is not true because of subselections" $ describe "dirForestCursorSelectPrevTree and dirForestCursorSelectNextTree" $ do
+  xdescribe "is not true because of subselections" $ describe "dirForestCursorSelectPrevTree and dirForestCursorSelectNextTree" $
     inverseMMovementsSpec dirForestCursorSelectPrevTree dirForestCursorSelectNextTree
   describe "dirForestCursorSelectFirstTree" $ forestMovementSpec dirForestCursorSelectFirstTree
   describe "dirForestCursorSelectLastTree" $ forestMovementSpec dirForestCursorSelectLastTree
@@ -49,11 +50,11 @@ spec = modifyMaxShrinks (const 0) $ do
     inverseMovementsSpec dirForestCursorSelectFirstTree dirForestCursorSelectLastTree
   describe "dirForestCursorSelectPrevOnSameLevel" $ forestMovementMSpec dirForestCursorSelectPrevOnSameLevel
   describe "dirForestCursorSelectNextOnSameLevel" $ forestMovementMSpec dirForestCursorSelectNextOnSameLevel
-  xdescribe "is not true because of ordering of files in the map" $ describe "dirForestCursorSelectPrevOnSameLevel and dirForestCursorSelectNextOnSameLevel" $ do
+  xdescribe "is not true because of ordering of files in the map" $ describe "dirForestCursorSelectPrevOnSameLevel and dirForestCursorSelectNextOnSameLevel" $
     inverseMMovementsSpec dirForestCursorSelectPrevOnSameLevel dirForestCursorSelectNextOnSameLevel
   describe "dirForestCursorSelectFirstOnSameLevel" $ forestMovementSpec dirForestCursorSelectFirstOnSameLevel
   describe "dirForestCursorSelectLastOnSameLevel" $ forestMovementSpec dirForestCursorSelectLastOnSameLevel
-  xdescribe "is not true because of ordering of files in the map" $ describe "dirForestCursorSelectFirstOnSameLevel and dirForestCursorSelectLastOnSameLevel" $ do
+  xdescribe "is not true because of ordering of files in the map" $ describe "dirForestCursorSelectFirstOnSameLevel and dirForestCursorSelectLastOnSameLevel" $
     inverseMovementsSpec dirForestCursorSelectFirstOnSameLevel dirForestCursorSelectLastOnSameLevel
   describe "dirForestCursorSelectPrev" $ forestMovementMSpec dirForestCursorSelectPrev
   describe "dirForestCursorSelectNext" $ forestMovementMSpec dirForestCursorSelectNext
