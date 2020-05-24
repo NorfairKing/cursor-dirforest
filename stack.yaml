@@ -4,88 +4,59 @@ packages:
 - cursor-dirforest-gen
 - cursor-dirforest-brick
 - cursor-dirforest-demo
-- ../dirforest/dirforest
-- ../dirforest/genvalidity-dirforest
-- ../cursor/cursor
-- ../cursor/cursor-gen
-- ../cursor-brick/cursor-brick
-- ../validity/genvalidity
-- ../validity/genvalidity-aeson
-- ../validity/genvalidity-bytestring
-- ../validity/genvalidity-containers
-- ../validity/genvalidity-criterion
-- ../validity/genvalidity-hspec
-- ../validity/genvalidity-hspec-aeson
-- ../validity/genvalidity-hspec-binary
-- ../validity/genvalidity-hspec-cereal
-- ../validity/genvalidity-hspec-hashable
-- ../validity/genvalidity-hspec-optics
-- ../validity/genvalidity-hspec-persistent
-- ../validity/genvalidity-path
-- ../validity/genvalidity-property
-- ../validity/genvalidity-scientific
-- ../validity/genvalidity-text
-- ../validity/genvalidity-time
-- ../validity/genvalidity-unordered-containers
-- ../validity/genvalidity-uuid
-- ../validity/genvalidity-vector
-- ../validity/validity
-- ../validity/validity-aeson
-- ../validity/validity-bytestring
-- ../validity/validity-containers
-- ../validity/validity-path
-- ../validity/validity-primitive
-- ../validity/validity-scientific
-- ../validity/validity-text
-- ../validity/validity-time
-- ../validity/validity-unordered-containers
-- ../validity/validity-uuid
-- ../validity/validity-vector
 
 extra-deps:
-# - cursor-brick-0.1.0.0
-# - github: NorfairKing/cursor
-#   commit: f9439d72d714a3eda34aaa8dd83ea4ff2976bce8
-#   subdirs:
-#   - cursor
-#   - cursor-gen
-# - github: NorfairKing/validity
-#   commit: 3d5bccbaac055164311ca9d90b0ac7ff7f2c412c
-#   subdirs:
-#   - genvalidity
-#   - genvalidity-aeson
-#   - genvalidity-bytestring
-#   - genvalidity-containers
-#   - genvalidity-criterion
-#   - genvalidity-hspec
-#   - genvalidity-hspec-aeson
-#   - genvalidity-hspec-binary
-#   - genvalidity-hspec-cereal
-#   - genvalidity-hspec-hashable
-#   - genvalidity-hspec-optics
-#   - genvalidity-hspec-persistent
-#   - genvalidity-path
-#   - genvalidity-property
-#   - genvalidity-scientific
-#   - genvalidity-text
-#   - genvalidity-time
-#   - genvalidity-unordered-containers
-#   - genvalidity-uuid
-#   - genvalidity-vector
-#   - validity
-#   - validity-aeson
-#   - validity-bytestring
-#   - validity-containers
-#   - validity-path
-#   - validity-primitive
-#   - validity-scientific
-#   - validity-text
-#   - validity-time
-#   - validity-unordered-containers
-#   - validity-uuid
-#   - validity-vector
+- github: NorfairKing/dirforest
+  commit: c0657315e01683558a8f20b991bc47d4733ed40e
+  subdirs:
+  - dirforest
+  - genvalidity-dirforest
+- github: NorfairKing/cursor-brick
+  commit: 58b2c811c721885eaa3c066b41bc4d4883e4566c
+  subdirs:
+  - cursor-brick
+- github: NorfairKing/cursor
+  commit: 6b8d2fab22cf380aaac5f6d0853ec8b3d4cdd0e1
+  subdirs:
+  - cursor
+  - cursor-gen
+- github: NorfairKing/validity
+  commit: b8c4cb4cafef7eb2feabaf767eb0d96c5fb5b573
+  subdirs:
+  - genvalidity
+  - genvalidity-aeson
+  - genvalidity-bytestring
+  - genvalidity-containers
+  - genvalidity-criterion
+  - genvalidity-hspec
+  - genvalidity-hspec-aeson
+  - genvalidity-hspec-binary
+  - genvalidity-hspec-cereal
+  - genvalidity-hspec-hashable
+  - genvalidity-hspec-optics
+  - genvalidity-hspec-persistent
+  - genvalidity-path
+  - genvalidity-property
+  - genvalidity-scientific
+  - genvalidity-text
+  - genvalidity-time
+  - genvalidity-unordered-containers
+  - genvalidity-uuid
+  - genvalidity-vector
+  - validity
+  - validity-aeson
+  - validity-bytestring
+  - validity-containers
+  - validity-path
+  - validity-primitive
+  - validity-scientific
+  - validity-text
+  - validity-time
+  - validity-unordered-containers
+  - validity-uuid
+  - validity-vector
 nix:
-  path: [ "nixpkgs=https://github.com/NixOS/nixpkgs/archive/a87b506140a7267477103759c3f8da5b2e8d994e.tar.gz"]
+  path: [ "nixpkgs=https://github.com/NixOS/nixpkgs/archive/323fe92057bb38475a446ff5e18d3b388c2e4403.tar.gz"]
   add-gc-roots: true
   pure: true
   packages:
