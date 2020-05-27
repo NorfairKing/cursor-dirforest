@@ -44,6 +44,9 @@ module Cursor.DirForest
     dirForestCursorSelectLastChild,
     dirForestCursorSelectParent,
 
+    -- * Edits
+    dirForestCursorDeleteCurrent,
+
     -- * Collapsing
 
     -- ** One level
@@ -61,6 +64,7 @@ import Control.DeepSeq
 import Cursor.Forest
 import Cursor.List.NonEmpty
 import Cursor.Tree
+import Cursor.Types
 import Data.DirForest (DirForest (..), DirTree (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
@@ -268,6 +272,9 @@ dirForestCursorSelectLastChild f g = dirForestCursorForestCursorL $ forestCursor
 
 dirForestCursorSelectParent :: (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorSelectParent f g = dirForestCursorForestCursorL $ forestCursorSelectAbove (fmap f) (fmap g)
+
+dirForestCursorDeleteCurrent :: (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
+dirForestCursorDeleteCurrent g = dirForestCursorForestCursorL $ forestCursorDeleteSubTree (fmap g)
 
 dirForestCursorOpen :: DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorOpen = dirForestCursorForestCursorL forestCursorOpenCurrentForest

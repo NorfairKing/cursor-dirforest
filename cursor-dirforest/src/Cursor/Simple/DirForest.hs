@@ -40,6 +40,9 @@ module Cursor.Simple.DirForest
     dirForestCursorSelectLastChild,
     dirForestCursorSelectParent,
 
+    -- * Edits
+    dirForestCursorDeleteCurrent,
+
     -- * Collapsing
 
     -- ** One level
@@ -54,6 +57,7 @@ module Cursor.Simple.DirForest
 where
 
 import qualified Cursor.DirForest as DFC
+import Cursor.Types
 import Data.DirForest (DirForest (..))
 
 type DirForestCursor a = DFC.DirForestCursor a a
@@ -111,3 +115,6 @@ dirForestCursorSelectLastChild = DFC.dirForestCursorSelectLastChild id id
 
 dirForestCursorSelectParent :: DirForestCursor a -> Maybe (DirForestCursor a)
 dirForestCursorSelectParent = DFC.dirForestCursorSelectParent id id
+
+dirForestCursorDeleteCurrent :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
+dirForestCursorDeleteCurrent = DFC.dirForestCursorDeleteCurrent id
