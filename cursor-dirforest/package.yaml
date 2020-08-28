@@ -18,3 +18,4 @@ library:
   - microlens
   - path
   - validity
+  - validity-path

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ae162df9fa307117fca999ea5d3e229798fc70e8d8f941553eb1700c1401ce81
+-- hash: e01c6bd996f06f9e78606696cf16d21b1bae9f5bf432fa77605e714ede1b8ffd
 
 name:           cursor-dirforest
 version:        0.0.0.0
@@ -20,6 +20,7 @@ source-repository head
 library
   exposed-modules:
       Cursor.DirForest
+      Cursor.FileOrDir
       Cursor.Simple.DirForest
   other-modules:
       Paths_cursor_dirforest
@@ -36,4 +37,5 @@ library
     , microlens
     , path
     , validity
+    , validity-path
   default-language: Haskell2010

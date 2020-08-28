@@ -61,6 +61,7 @@ module Cursor.DirForest
 where
 
 import Control.DeepSeq
+import Cursor.FileOrDir
 import Cursor.Forest
 import Cursor.List.NonEmpty
 import Cursor.Tree
@@ -156,20 +157,6 @@ instance (Validity a, Validity b) => Validity (DirForestCursor a b) where
 
 instance (NFData a, NFData b) => NFData (DirForestCursor a b)
 
-data FileOrDir a = FodFile (Path Rel File) a | FodDir (Path Rel Dir)
-  deriving (Show, Eq, Generic, Functor)
-
-instance (Validity a) => Validity (FileOrDir a) where
-  validate fod =
-    mconcat
-      [ genericValidate fod,
-        declare "The path is toplevel" $ case fod of
-          FodFile rf _ -> isTopLevel rf
-          FodDir rd -> isTopLevel rd
-      ]
-
-instance NFData a => NFData (FileOrDir a)
-
 dirForestCursorForestCursorL :: Lens' (DirForestCursor a b) (ForestCursor (FileOrDir a) (FileOrDir b))
 dirForestCursorForestCursorL = lens dirForestCursorForestCursor $ \dfc mc -> dfc {dirForestCursorForestCursor = mc}
 
@@ -208,9 +195,6 @@ rebuildDirForestCursor func = fromForest . NE.toList . NE.map rebuildCTree . reb
         goT (Node fod f) = case fod of
           FodFile rf v -> (fromRelFile rf, NodeFile v)
           FodDir rd -> (FP.dropTrailingPathSeparator $ fromRelDir rd, NodeDir $ goF f)
-
-isTopLevel :: Path Rel t -> Bool
-isTopLevel p_ = parent p_ == [reldir|./|]
 
 foldDirForestCursor :: ([CTree (FileOrDir b)] -> TreeCursor (FileOrDir a) (FileOrDir b) -> [CTree (FileOrDir b)] -> c) -> DirForestCursor a b -> c
 foldDirForestCursor func (DirForestCursor fc) = foldForestCursor func fc
