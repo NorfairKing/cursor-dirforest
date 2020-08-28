@@ -5,6 +5,8 @@
 module Cursor.DirForest.Gen where
 
 import Cursor.DirForest
+import Cursor.FileOrDir
+import Cursor.FileOrDir.Gen ()
 import Cursor.Forest
 import Cursor.Forest.Gen ()
 import Cursor.List.NonEmpty
@@ -14,18 +16,6 @@ import Data.GenValidity.Containers ()
 import Data.GenValidity.DirForest ()
 import Data.Tree
 import Test.QuickCheck
-
-instance (GenValid a) => GenValid (FileOrDir a) where
-  shrinkValid = shrinkValidStructurally
-  genValid =
-    oneof
-      [ sized $ \s -> do
-          (a, b) <- genSplit s
-          rf <- resize a $ genValid `suchThat` isTopLevel
-          v <- resize b genValid
-          pure $ FodFile rf v,
-        FodDir <$> (genValid `suchThat` isTopLevel)
-      ]
 
 instance (GenValid a, GenValid b) => GenValid (DirForestCursor a b) where
   shrinkValid = shrinkValidStructurally

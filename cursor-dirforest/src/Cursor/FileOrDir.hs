@@ -5,10 +5,16 @@
 module Cursor.FileOrDir where
 
 import Control.DeepSeq
+import Cursor.Text
 import Data.Validity
 import Data.Validity.Path ()
 import GHC.Generics (Generic)
 import Path
+
+data FileOrDirCursor a
+  = Existent (FileOrDir a)
+  | InProgress TextCursor
+  deriving (Show, Eq, Generic, Functor)
 
 data FileOrDir a = FodFile (Path Rel File) a | FodDir (Path Rel Dir)
   deriving (Show, Eq, Generic, Functor)
