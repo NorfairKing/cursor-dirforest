@@ -75,7 +75,6 @@ module Cursor.DirForest
 where
 
 import Control.DeepSeq
-import Control.Monad
 import Cursor.FileOrDir
 import Cursor.Forest
 import Cursor.List.NonEmpty
