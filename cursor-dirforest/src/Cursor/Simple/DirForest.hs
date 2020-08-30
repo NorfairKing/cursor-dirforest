@@ -74,7 +74,7 @@ makeDirForestCursor :: DirForest a -> Maybe (DirForestCursor a)
 makeDirForestCursor = DFC.makeDirForestCursor id
 
 dirForestCursorPrepareForMovement :: DirForestCursor a -> DeleteOrUpdate (ForestCursor (DFC.FileOrDir a))
-dirForestCursorPrepareForMovement = DFC.dirForestCursorPrepareForMovement id id
+dirForestCursorPrepareForMovement = DFC.dirForestCursorPrepareForMovement id
 
 rebuildDirForestCursor :: DirForestCursor a -> DeleteOrUpdate (DirForest a)
 rebuildDirForestCursor = DFC.rebuildDirForestCursor id id
@@ -125,7 +125,7 @@ dirForestCursorSelectParent :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirFo
 dirForestCursorSelectParent = DFC.dirForestCursorSelectParent id id
 
 dirForestCursorDeleteCurrent :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
-dirForestCursorDeleteCurrent = DFC.dirForestCursorDeleteCurrent id id
+dirForestCursorDeleteCurrent = DFC.dirForestCursorDeleteCurrent id
 
 dirForestCursorStartNew :: DirForestCursor a -> Maybe (DirForestCursor a)
-dirForestCursorStartNew = DFC.dirForestCursorStartNew id
+dirForestCursorStartNew = DFC.dirForestCursorStartNew id id

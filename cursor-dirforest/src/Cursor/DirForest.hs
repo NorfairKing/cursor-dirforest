@@ -3,6 +3,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Cursor.DirForest
   ( -- * Types
@@ -70,6 +71,7 @@ import Control.Monad
 import Cursor.FileOrDir
 import Cursor.Forest
 import Cursor.List.NonEmpty
+import Cursor.Text
 import Cursor.Tree
 import Cursor.Types
 import Data.DirForest (DirForest (..), DirTree (..))
@@ -192,8 +194,8 @@ makeDirForestCursor func = fmap (DirForestCursor . makeForestCursor (fmap func .
           NodeFile v -> Node (FodFile (Path f) v) []
           NodeDir df -> Node (FodDir (Path $ FP.addTrailingPathSeparator f)) (goDF df)
 
-dirForestCursorPrepareForMovement :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (ForestCursor (FileOrDir a) (FileOrDir b))
-dirForestCursorPrepareForMovement f g dfc =
+dirForestCursorPrepareForMovement :: (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (ForestCursor (FileOrDir a) (FileOrDir b))
+dirForestCursorPrepareForMovement g dfc =
   fmap (mapForestCursor (fromJust . rebuildFileOrDirCursor) id)
     $ ( case dfc ^. dirForestCursorSelectedL of
           InProgress _ -> forestCursorRemoveElem (fmap g . makeFileOrDirCursor)
@@ -202,7 +204,7 @@ dirForestCursorPrepareForMovement f g dfc =
     $ dirForestCursorForestCursor dfc
 
 rebuildDirForestCursor :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForest b)
-rebuildDirForestCursor f g = fmap (fromForest . NE.toList . NE.map rebuildCTree . rebuildForestCursor (fmap f)) . dirForestCursorPrepareForMovement f g
+rebuildDirForestCursor f g = fmap (fromForest . NE.toList . NE.map rebuildCTree . rebuildForestCursor (fmap f)) . dirForestCursorPrepareForMovement g
   where
     fromForest :: Forest (FileOrDir b) -> DirForest b
     fromForest = goF
@@ -210,9 +212,9 @@ rebuildDirForestCursor f g = fmap (fromForest . NE.toList . NE.map rebuildCTree 
         goF :: Forest (FileOrDir b) -> DirForest b
         goF = DirForest . M.fromList . map goT
         goT :: Tree (FileOrDir b) -> (FilePath, DirTree b)
-        goT (Node fod f) = case fod of
+        goT (Node fod forest) = case fod of
           FodFile rf v -> (fromRelFile rf, NodeFile v)
-          FodDir rd -> (FP.dropTrailingPathSeparator $ fromRelDir rd, NodeDir $ goF f)
+          FodDir rd -> (FP.dropTrailingPathSeparator $ fromRelDir rd, NodeDir $ goF forest)
 
 foldDirForestCursor :: ([CTree (FileOrDir b)] -> TreeCursor (FileOrDirCursor a) (FileOrDir b) -> [CTree (FileOrDir b)] -> c) -> DirForestCursor a b -> c
 foldDirForestCursor func (DirForestCursor fc) = foldForestCursor func fc
@@ -230,67 +232,79 @@ dirForestCursorSelected dfc =
         FodDir rp -> goMAbove (rp </> d, fod) (treeAboveAbove ta)
    in goMAbove ([reldir|./|], treeCurrent tc) (treeAbove tc)
 
-doMovementF :: forall a b f. Functor f => (a -> b) -> (b -> a) -> (ForestCursor (FileOrDir a) (FileOrDir b) -> f (ForestCursor (FileOrDir a) (FileOrDir b))) -> DirForestCursor a b -> DeleteOrUpdate (f (DirForestCursor a b))
-doMovementF f g movementFunc =
+doMovementF :: forall a b f. Functor f => (b -> a) -> (ForestCursor (FileOrDir a) (FileOrDir b) -> f (ForestCursor (FileOrDir a) (FileOrDir b))) -> DirForestCursor a b -> DeleteOrUpdate (f (DirForestCursor a b))
+doMovementF g movementFunc =
   fmap
     ( fmap (DirForestCursor . mapForestCursor makeFileOrDirCursor id)
         . movementFunc
     )
-    . dirForestCursorPrepareForMovement f g
+    . dirForestCursorPrepareForMovement g
 
-doMovement :: forall a b. (a -> b) -> (b -> a) -> (ForestCursor (FileOrDir a) (FileOrDir b) -> ForestCursor (FileOrDir a) (FileOrDir b)) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
-doMovement f g func = fmap runIdentity . doMovementF f g (Identity . func)
+doMovement :: forall a b. (b -> a) -> (ForestCursor (FileOrDir a) (FileOrDir b) -> ForestCursor (FileOrDir a) (FileOrDir b)) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
+doMovement g func = fmap runIdentity . doMovementF g (Identity . func)
 
 dirForestCursorSelectPrevOnSameLevel :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
-dirForestCursorSelectPrevOnSameLevel f g = doMovementF f g (forestCursorSelectPrevOnSameLevel (fmap f) (fmap g))
+dirForestCursorSelectPrevOnSameLevel f g = doMovementF g (forestCursorSelectPrevOnSameLevel (fmap f) (fmap g))
 
 dirForestCursorSelectNextOnSameLevel :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
-dirForestCursorSelectNextOnSameLevel f g = doMovementF f g $ forestCursorSelectNextOnSameLevel (fmap f) (fmap g)
+dirForestCursorSelectNextOnSameLevel f g = doMovementF g $ forestCursorSelectNextOnSameLevel (fmap f) (fmap g)
 
 dirForestCursorSelectFirstOnSameLevel :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
-dirForestCursorSelectFirstOnSameLevel f g = doMovement f g $ forestCursorSelectFirstOnSameLevel (fmap f) (fmap g)
+dirForestCursorSelectFirstOnSameLevel f g = doMovement g $ forestCursorSelectFirstOnSameLevel (fmap f) (fmap g)
 
 dirForestCursorSelectLastOnSameLevel :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
-dirForestCursorSelectLastOnSameLevel f g = doMovement f g $ forestCursorSelectLastOnSameLevel (fmap f) (fmap g)
+dirForestCursorSelectLastOnSameLevel f g = doMovement g $ forestCursorSelectLastOnSameLevel (fmap f) (fmap g)
 
 dirForestCursorSelectPrevTree :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
-dirForestCursorSelectPrevTree f g = doMovementF f g $ forestCursorSelectPrevTreeCursor (fmap f) (fmap g)
+dirForestCursorSelectPrevTree f g = doMovementF g $ forestCursorSelectPrevTreeCursor (fmap f) (fmap g)
 
 dirForestCursorSelectNextTree :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
-dirForestCursorSelectNextTree f g = doMovementF f g $ forestCursorSelectNextTreeCursor (fmap f) (fmap g)
+dirForestCursorSelectNextTree f g = doMovementF g $ forestCursorSelectNextTreeCursor (fmap f) (fmap g)
 
 dirForestCursorSelectFirstTree :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
-dirForestCursorSelectFirstTree f g = doMovement f g $ forestCursorSelectFirstTreeCursor (fmap f) (fmap g)
+dirForestCursorSelectFirstTree f g = doMovement g $ forestCursorSelectFirstTreeCursor (fmap f) (fmap g)
 
 dirForestCursorSelectLastTree :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
-dirForestCursorSelectLastTree f g = doMovement f g $ forestCursorSelectLastTreeCursor (fmap f) (fmap g)
+dirForestCursorSelectLastTree f g = doMovement g $ forestCursorSelectLastTreeCursor (fmap f) (fmap g)
 
 dirForestCursorSelectPrev :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
-dirForestCursorSelectPrev f g = doMovementF f g $ forestCursorSelectPrev (fmap f) (fmap g)
+dirForestCursorSelectPrev f g = doMovementF g $ forestCursorSelectPrev (fmap f) (fmap g)
 
 dirForestCursorSelectNext :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
-dirForestCursorSelectNext f g = doMovementF f g $ forestCursorSelectNext (fmap f) (fmap g)
+dirForestCursorSelectNext f g = doMovementF g $ forestCursorSelectNext (fmap f) (fmap g)
 
 dirForestCursorSelectFirst :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
-dirForestCursorSelectFirst f g = doMovement f g $ forestCursorSelectFirst (fmap f) (fmap g)
+dirForestCursorSelectFirst f g = doMovement g $ forestCursorSelectFirst (fmap f) (fmap g)
 
 dirForestCursorSelectLast :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
-dirForestCursorSelectLast f g = doMovement f g $ forestCursorSelectLast (fmap f) (fmap g)
+dirForestCursorSelectLast f g = doMovement g $ forestCursorSelectLast (fmap f) (fmap g)
 
 dirForestCursorSelectFirstChild :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
-dirForestCursorSelectFirstChild f g = doMovementF f g $ forestCursorSelectBelowAtStart (fmap f) (fmap g)
+dirForestCursorSelectFirstChild f g = doMovementF g $ forestCursorSelectBelowAtStart (fmap f) (fmap g)
 
 dirForestCursorSelectLastChild :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
-dirForestCursorSelectLastChild f g = doMovementF f g $ forestCursorSelectBelowAtEnd (fmap f) (fmap g)
+dirForestCursorSelectLastChild f g = doMovementF g $ forestCursorSelectBelowAtEnd (fmap f) (fmap g)
 
 dirForestCursorSelectParent :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
-dirForestCursorSelectParent f g = doMovementF f g $ forestCursorSelectAbove (fmap f) (fmap g)
+dirForestCursorSelectParent f g = doMovementF g $ forestCursorSelectAbove (fmap f) (fmap g)
 
-dirForestCursorDeleteCurrent :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
-dirForestCursorDeleteCurrent f g = join . doMovementF f g (forestCursorDeleteSubTree (fmap g))
+dirForestCursorDeleteCurrent :: (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
+dirForestCursorDeleteCurrent g = join . doMovementF g (forestCursorDeleteSubTree (fmap g))
 
-dirForestCursorStartNew :: (a -> b) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
-dirForestCursorStartNew f = undefined
+dirForestCursorStartNew :: forall a b. (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorStartNew f g dfc = case dfc ^. dirForestCursorSelectedL of
+  InProgress _ -> Nothing
+  Existent _ ->
+    let tc = singletonTreeCursor $ InProgress emptyTextCursor
+     in Just $ case dirForestCursorPrepareForMovement g dfc of
+          Deleted -> DirForestCursor $ ForestCursor $ singletonNonEmptyCursor tc
+          Updated fc ->
+            DirForestCursor
+              $ forestCursorInsertAndSelectTreeCursor (fmap f . fromJust . rebuildFileOrDirCursor) tc
+              $ mapForestCursor
+                Existent
+                id
+                fc
 
 dirForestCursorOpen :: DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorOpen = dirForestCursorForestCursorL forestCursorOpenCurrentForest

@@ -123,6 +123,7 @@ handleTuiEvent s e =
             EvKey (KChar 'g') [] -> doP dirForestCursorSelectFirst
             EvKey (KChar 'G') [] -> doP dirForestCursorSelectLast
             EvKey (KChar 'p') [] -> doM dirForestCursorSelectParent
+            EvKey (KChar 'n') [] -> doMM dirForestCursorStartNew
             EvKey KLeft [] -> doM dirForestCursorSelectParent
             EvKey KRight [] -> doM dirForestCursorSelectLastChild
             EvKey KDown [] -> doM dirForestCursorSelectNext
