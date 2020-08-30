@@ -19,6 +19,7 @@ import Data.Int
 import Data.Maybe
 import Graphics.Vty.Attributes
 import Graphics.Vty.Input.Events
+import Lens.Micro
 import Path
 import Path.IO
 import System.Posix
@@ -114,21 +115,33 @@ handleTuiEvent s e =
             Updated (Just c') -> Updated c'
           doMM :: (DirForestCursor Int64 -> Maybe (DirForestCursor Int64)) -> EventM n (Next TuiState)
           doMM func = doP $ \c -> Updated $ fromMaybe c $ func c
-       in case vtye of
-            EvKey (KChar 'q') [] -> halt s
-            EvKey (KChar 'f') [] -> doM dirForestCursorSelectFirstChild
-            EvKey (KChar 'l') [] -> doM dirForestCursorSelectLastChild
-            EvKey (KChar 'j') [] -> doM dirForestCursorSelectNext
-            EvKey (KChar 'k') [] -> doM dirForestCursorSelectPrev
-            EvKey (KChar 'g') [] -> doP dirForestCursorSelectFirst
-            EvKey (KChar 'G') [] -> doP dirForestCursorSelectLast
-            EvKey (KChar 'p') [] -> doM dirForestCursorSelectParent
-            EvKey (KChar 'n') [] -> doMM dirForestCursorStartNew
-            EvKey KLeft [] -> doM dirForestCursorSelectParent
-            EvKey KRight [] -> doM dirForestCursorSelectLastChild
-            EvKey KDown [] -> doM dirForestCursorSelectNext
-            EvKey KUp [] -> doM dirForestCursorSelectPrev
-            EvKey (KChar '\t') [] -> doMM dirForestCursorToggle
-            EvKey KEnter [] -> doMM dirForestCursorToggle
-            _ -> continue s
+       in case stateCursor s of
+            Nothing -> case vtye of
+              EvKey (KChar 'n') [] -> doMM dirForestCursorStartNew
+              _ -> continue s
+            Just dfc -> case dfc ^. dirForestCursorSelectedL of
+              InProgress _ ->
+                case vtye of
+                  EvKey KEsc [] -> doP dirForestCursorDeleteCurrent
+                  EvKey (KChar c) [] -> doMM $ dirForestCursorInsert c
+                  _ -> continue s
+              Existent _ ->
+                case vtye of
+                  EvKey (KChar 'q') [] -> halt s
+                  EvKey (KChar 'f') [] -> doM dirForestCursorSelectFirstChild
+                  EvKey (KChar 'l') [] -> doM dirForestCursorSelectLastChild
+                  EvKey (KChar 'j') [] -> doM dirForestCursorSelectNext
+                  EvKey (KChar 'k') [] -> doM dirForestCursorSelectPrev
+                  EvKey (KChar 'g') [] -> doP dirForestCursorSelectFirst
+                  EvKey (KChar 'G') [] -> doP dirForestCursorSelectLast
+                  EvKey (KChar 'p') [] -> doM dirForestCursorSelectParent
+                  EvKey (KChar 'n') [] -> doMM dirForestCursorStartNew
+                  EvKey (KChar 'd') [] -> doP dirForestCursorDeleteCurrent
+                  EvKey KLeft [] -> doM dirForestCursorSelectParent
+                  EvKey KRight [] -> doM dirForestCursorSelectLastChild
+                  EvKey KDown [] -> doM dirForestCursorSelectNext
+                  EvKey KUp [] -> doM dirForestCursorSelectPrev
+                  EvKey (KChar '\t') [] -> doMM dirForestCursorToggle
+                  EvKey KEnter [] -> doMM dirForestCursorToggle
+                  _ -> continue s
     _ -> continue s

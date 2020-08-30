@@ -79,6 +79,8 @@ spec = modifyMaxShrinks (const 0) $ do
         inverseMProp dirForestCursorSelectLastChild dirForestCursorSelectParent
   describe "dirForestCursorDeleteCurrent" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorDeleteCurrent @Word8)
   describe "dirForestCursorStartNew" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStartNew @Word8)
+  describe "dirForestCursorInsert" $ it "produces valid results" $ producesValidsOnValids2 (dirForestCursorInsert @Word8 @Word8)
+  describe "dirForestCursorAppend" $ it "produces valid results" $ producesValidsOnValids2 (dirForestCursorAppend @Word8 @Word8)
 
 inverseMovementsSpec ::
   (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)) ->

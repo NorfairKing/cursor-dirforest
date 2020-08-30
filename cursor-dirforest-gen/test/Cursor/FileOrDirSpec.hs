@@ -27,5 +27,7 @@ spec = do
       producesValidsOnValids
         (rebuildFileOrDirCursor @Word8)
     it "roundtrips with makeFileOrDirCursor" $ forAllValid $ \fod -> rebuildFileOrDirCursor (makeFileOrDirCursor @Word8 fod) `shouldBe` Just fod
+  describe "fileOrDirCursorInsert" $ it "produces valid results" $ producesValidsOnValids2 (fileOrDirCursorInsert @Word8)
+  describe "fileOrDirCursorAppend" $ it "produces valid results" $ producesValidsOnValids2 (fileOrDirCursorAppend @Word8)
   describe "completeTextCursorToFile" $ it "produces valid results" $ producesValidsOnValids completeTextCursorToFile
   describe "completeTextCursorToDir" $ it "produces valid results" $ producesValidsOnValids completeTextCursorToDir

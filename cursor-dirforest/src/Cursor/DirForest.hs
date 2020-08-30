@@ -52,6 +52,8 @@ module Cursor.DirForest
     -- * Edits
     dirForestCursorDeleteCurrent,
     dirForestCursorStartNew,
+    dirForestCursorInsert,
+    dirForestCursorAppend,
 
     -- * Collapsing
 
@@ -289,7 +291,7 @@ dirForestCursorSelectParent :: (a -> b) -> (b -> a) -> DirForestCursor a b -> De
 dirForestCursorSelectParent f g = doMovementF g $ forestCursorSelectAbove (fmap f) (fmap g)
 
 dirForestCursorDeleteCurrent :: (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
-dirForestCursorDeleteCurrent g = join . doMovementF g (forestCursorDeleteSubTree (fmap g))
+dirForestCursorDeleteCurrent g = dirForestCursorForestCursorL $ forestCursorDeleteSubTree (fmap g . makeFileOrDirCursor)
 
 dirForestCursorStartNew :: forall a b. (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorStartNew f g dfc = case dfc ^. dirForestCursorSelectedL of
@@ -305,6 +307,12 @@ dirForestCursorStartNew f g dfc = case dfc ^. dirForestCursorSelectedL of
                 Existent
                 id
                 fc
+
+dirForestCursorInsert :: Char -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorInsert c = dirForestCursorSelectedL $ fileOrDirCursorInsert c
+
+dirForestCursorAppend :: Char -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorAppend c = dirForestCursorSelectedL $ fileOrDirCursorAppend c
 
 dirForestCursorOpen :: DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorOpen = dirForestCursorForestCursorL forestCursorOpenCurrentForest

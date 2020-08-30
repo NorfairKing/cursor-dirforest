@@ -30,6 +30,16 @@ rebuildFileOrDirCursor = \case
   Existent fod -> Just fod
   InProgress _ -> Nothing
 
+fileOrDirCursorInsert :: Char -> FileOrDirCursor a -> Maybe (FileOrDirCursor a)
+fileOrDirCursorInsert c = \case
+  Existent _ -> Nothing
+  InProgress tc -> InProgress <$> textCursorInsert c tc
+
+fileOrDirCursorAppend :: Char -> FileOrDirCursor a -> Maybe (FileOrDirCursor a)
+fileOrDirCursorAppend c = \case
+  Existent _ -> Nothing
+  InProgress tc -> InProgress <$> textCursorAppend c tc
+
 completeTextCursorToFile :: TextCursor -> Maybe (Path Rel File)
 completeTextCursorToFile = parseRelFile . T.unpack . rebuildTextCursor
 

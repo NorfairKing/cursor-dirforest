@@ -15,9 +15,10 @@ library:
   - cursor-dirforest-brick
   - directory
   - dirforest
+  - microlens
   - path
-  - pretty-show
   - path-io
+  - pretty-show
   - unix
   - vty
 
