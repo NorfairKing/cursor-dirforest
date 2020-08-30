@@ -113,6 +113,11 @@ handleTuiEvent s e =
             Deleted -> Updated c
             Updated Nothing -> Updated c
             Updated (Just c') -> Updated c'
+          doD :: (DirForestCursor Int64 -> Maybe (DeleteOrUpdate (DirForestCursor Int64))) -> EventM n (Next TuiState)
+          doD func = doP $ \c -> case func c of
+            Nothing -> Updated c
+            Just Deleted -> Deleted
+            Just (Updated c') -> Updated c'
           doMM :: (DirForestCursor Int64 -> Maybe (DirForestCursor Int64)) -> EventM n (Next TuiState)
           doMM func = doP $ \c -> Updated $ fromMaybe c $ func c
        in case stateCursor s of
@@ -123,7 +128,9 @@ handleTuiEvent s e =
               InProgress _ ->
                 case vtye of
                   EvKey KEsc [] -> doP dirForestCursorDeleteCurrent
-                  EvKey (KChar c) [] -> doMM $ dirForestCursorInsert c
+                  EvKey (KChar c) [] -> doMM $ dirForestCursorInsertChar c
+                  EvKey KBS [] -> doD dirForestCursorRemoveChar
+                  EvKey KDel [] -> doD dirForestCursorDeleteChar
                   _ -> continue s
               Existent _ ->
                 case vtye of

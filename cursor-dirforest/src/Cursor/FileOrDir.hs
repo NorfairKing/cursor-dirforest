@@ -7,6 +7,7 @@ module Cursor.FileOrDir where
 
 import Control.DeepSeq
 import Cursor.Text
+import Cursor.Types
 import qualified Data.Text as T
 import Data.Validity
 import Data.Validity.Path ()
@@ -30,15 +31,25 @@ rebuildFileOrDirCursor = \case
   Existent fod -> Just fod
   InProgress _ -> Nothing
 
-fileOrDirCursorInsert :: Char -> FileOrDirCursor a -> Maybe (FileOrDirCursor a)
-fileOrDirCursorInsert c = \case
+fileOrDirCursorInsertChar :: Char -> FileOrDirCursor a -> Maybe (FileOrDirCursor a)
+fileOrDirCursorInsertChar c = \case
   Existent _ -> Nothing
   InProgress tc -> InProgress <$> textCursorInsert c tc
 
-fileOrDirCursorAppend :: Char -> FileOrDirCursor a -> Maybe (FileOrDirCursor a)
-fileOrDirCursorAppend c = \case
+fileOrDirCursorAppendChar :: Char -> FileOrDirCursor a -> Maybe (FileOrDirCursor a)
+fileOrDirCursorAppendChar c = \case
   Existent _ -> Nothing
   InProgress tc -> InProgress <$> textCursorAppend c tc
+
+fileOrDirCursorRemoveChar :: FileOrDirCursor a -> Maybe (DeleteOrUpdate (FileOrDirCursor a))
+fileOrDirCursorRemoveChar = \case
+  Existent _ -> Nothing
+  InProgress tc -> fmap InProgress <$> textCursorRemove tc
+
+fileOrDirCursorDeleteChar :: FileOrDirCursor a -> Maybe (DeleteOrUpdate (FileOrDirCursor a))
+fileOrDirCursorDeleteChar = \case
+  Existent _ -> Nothing
+  InProgress tc -> fmap InProgress <$> textCursorDelete tc
 
 completeTextCursorToFile :: TextCursor -> Maybe (Path Rel File)
 completeTextCursorToFile = parseRelFile . T.unpack . rebuildTextCursor

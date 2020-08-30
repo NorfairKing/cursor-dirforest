@@ -52,8 +52,10 @@ module Cursor.DirForest
     -- * Edits
     dirForestCursorDeleteCurrent,
     dirForestCursorStartNew,
-    dirForestCursorInsert,
-    dirForestCursorAppend,
+    dirForestCursorInsertChar,
+    dirForestCursorAppendChar,
+    dirForestCursorRemoveChar,
+    dirForestCursorDeleteChar,
 
     -- * Collapsing
 
@@ -308,11 +310,17 @@ dirForestCursorStartNew f g dfc = case dfc ^. dirForestCursorSelectedL of
                 id
                 fc
 
-dirForestCursorInsert :: Char -> DirForestCursor a b -> Maybe (DirForestCursor a b)
-dirForestCursorInsert c = dirForestCursorSelectedL $ fileOrDirCursorInsert c
+dirForestCursorInsertChar :: Char -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorInsertChar c = dirForestCursorSelectedL $ fileOrDirCursorInsertChar c
 
-dirForestCursorAppend :: Char -> DirForestCursor a b -> Maybe (DirForestCursor a b)
-dirForestCursorAppend c = dirForestCursorSelectedL $ fileOrDirCursorAppend c
+dirForestCursorAppendChar :: Char -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorAppendChar c = dirForestCursorSelectedL $ fileOrDirCursorAppendChar c
+
+dirForestCursorRemoveChar :: DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
+dirForestCursorRemoveChar = focusPossibleDeleteOrUpdate dirForestCursorSelectedL fileOrDirCursorRemoveChar
+
+dirForestCursorDeleteChar :: DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
+dirForestCursorDeleteChar = focusPossibleDeleteOrUpdate dirForestCursorSelectedL fileOrDirCursorDeleteChar
 
 dirForestCursorOpen :: DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorOpen = dirForestCursorForestCursorL forestCursorOpenCurrentForest

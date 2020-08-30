@@ -46,8 +46,10 @@ module Cursor.Simple.DirForest
     -- * Edits
     dirForestCursorDeleteCurrent,
     dirForestCursorStartNew,
-    DFC.dirForestCursorInsert,
-    DFC.dirForestCursorAppend,
+    DFC.dirForestCursorInsertChar,
+    DFC.dirForestCursorAppendChar,
+    DFC.dirForestCursorRemoveChar,
+    DFC.dirForestCursorDeleteChar,
 
     -- * Collapsing
 
