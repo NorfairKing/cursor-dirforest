@@ -48,6 +48,8 @@ module Cursor.DirForest
     dirForestCursorSelectFirstChild,
     dirForestCursorSelectLastChild,
     dirForestCursorSelectParent,
+    dirForestCursorSelectPrevChar,
+    dirForestCursorSelectNextChar,
 
     -- * Edits
     dirForestCursorDeleteCurrent,
@@ -291,6 +293,12 @@ dirForestCursorSelectLastChild f g = doMovementF g $ forestCursorSelectBelowAtEn
 
 dirForestCursorSelectParent :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (Maybe (DirForestCursor a b))
 dirForestCursorSelectParent f g = doMovementF g $ forestCursorSelectAbove (fmap f) (fmap g)
+
+dirForestCursorSelectPrevChar :: DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorSelectPrevChar = dirForestCursorSelectedL fileOrDirCursorSelectPrevChar
+
+dirForestCursorSelectNextChar :: DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorSelectNextChar = dirForestCursorSelectedL fileOrDirCursorSelectNextChar
 
 dirForestCursorDeleteCurrent :: (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
 dirForestCursorDeleteCurrent g = dirForestCursorForestCursorL $ forestCursorDeleteSubTree (fmap g . makeFileOrDirCursor)

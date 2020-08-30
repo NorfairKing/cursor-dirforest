@@ -83,6 +83,8 @@ spec = modifyMaxShrinks (const 0) $ do
   describe "dirForestCursorAppendChar" $ it "produces valid results" $ producesValidsOnValids2 (dirForestCursorAppendChar @Word8 @Word8)
   describe "dirForestCursorRemoveChar" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorRemoveChar @Word8 @Word8)
   describe "dirForestCursorDeleteChar" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorDeleteChar @Word8 @Word8)
+  describe "dirForestCursorSelectPrevChar" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorSelectPrevChar @Word8 @Word8)
+  describe "dirForestCursorSelectNextChar" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorSelectNextChar @Word8 @Word8)
 
 inverseMovementsSpec ::
   (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)) ->

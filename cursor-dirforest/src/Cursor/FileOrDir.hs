@@ -51,6 +51,16 @@ fileOrDirCursorDeleteChar = \case
   Existent _ -> Nothing
   InProgress tc -> fmap InProgress <$> textCursorDelete tc
 
+fileOrDirCursorSelectPrevChar :: FileOrDirCursor a -> Maybe (FileOrDirCursor a)
+fileOrDirCursorSelectPrevChar = \case
+  Existent _ -> Nothing
+  InProgress tc -> InProgress <$> textCursorSelectPrev tc
+
+fileOrDirCursorSelectNextChar :: FileOrDirCursor a -> Maybe (FileOrDirCursor a)
+fileOrDirCursorSelectNextChar = \case
+  Existent _ -> Nothing
+  InProgress tc -> InProgress <$> textCursorSelectNext tc
+
 completeTextCursorToFile :: TextCursor -> Maybe (Path Rel File)
 completeTextCursorToFile = parseRelFile . T.unpack . rebuildTextCursor
 

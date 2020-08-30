@@ -31,5 +31,7 @@ spec = do
   describe "fileOrDirCursorAppendChar" $ it "produces valid results" $ producesValidsOnValids2 (fileOrDirCursorAppendChar @Word8)
   describe "fileOrDirCursorRemoveChar" $ it "produces valid results" $ producesValidsOnValids (fileOrDirCursorRemoveChar @Word8)
   describe "fileOrDirCursorDeleteChar" $ it "produces valid results" $ producesValidsOnValids (fileOrDirCursorDeleteChar @Word8)
+  describe "fileOrDirCursorSelectPrevChar" $ it "produces valid results" $ producesValidsOnValids (fileOrDirCursorSelectPrevChar @Word8)
+  describe "fileOrDirCursorSelectNextChar" $ it "produces valid results" $ producesValidsOnValids (fileOrDirCursorSelectNextChar @Word8)
   describe "completeTextCursorToFile" $ it "produces valid results" $ producesValidsOnValids completeTextCursorToFile
   describe "completeTextCursorToDir" $ it "produces valid results" $ producesValidsOnValids completeTextCursorToDir

@@ -42,6 +42,8 @@ module Cursor.Simple.DirForest
     dirForestCursorSelectFirstChild,
     dirForestCursorSelectLastChild,
     dirForestCursorSelectParent,
+    DFC.dirForestCursorSelectPrevChar,
+    DFC.dirForestCursorSelectNextChar,
 
     -- * Edits
     dirForestCursorDeleteCurrent,

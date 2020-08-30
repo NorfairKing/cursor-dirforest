@@ -131,6 +131,8 @@ handleTuiEvent s e =
                   EvKey (KChar c) [] -> doMM $ dirForestCursorInsertChar c
                   EvKey KBS [] -> doD dirForestCursorRemoveChar
                   EvKey KDel [] -> doD dirForestCursorDeleteChar
+                  EvKey KLeft [] -> doMM dirForestCursorSelectPrevChar
+                  EvKey KRight [] -> doMM dirForestCursorSelectNextChar
                   _ -> continue s
               Existent _ ->
                 case vtye of
