@@ -58,6 +58,8 @@ module Cursor.DirForest
     dirForestCursorAppendChar,
     dirForestCursorRemoveChar,
     dirForestCursorDeleteChar,
+    dirForestCursorCompleteToDir,
+    dirForestCursorCompleteToFile,
 
     -- * Collapsing
 
@@ -329,6 +331,12 @@ dirForestCursorRemoveChar = focusPossibleDeleteOrUpdate dirForestCursorSelectedL
 
 dirForestCursorDeleteChar :: DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
 dirForestCursorDeleteChar = focusPossibleDeleteOrUpdate dirForestCursorSelectedL fileOrDirCursorDeleteChar
+
+dirForestCursorCompleteToDir :: DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorCompleteToDir = dirForestCursorSelectedL fileOrDirCursorCompleteToDir
+
+dirForestCursorCompleteToFile :: a -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorCompleteToFile a = dirForestCursorSelectedL $ fileOrDirCursorCompleteToFile a
 
 dirForestCursorOpen :: DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorOpen = dirForestCursorForestCursorL forestCursorOpenCurrentForest

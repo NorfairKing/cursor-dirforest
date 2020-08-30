@@ -133,6 +133,8 @@ handleTuiEvent s e =
                   EvKey KDel [] -> doD dirForestCursorDeleteChar
                   EvKey KLeft [] -> doMM dirForestCursorSelectPrevChar
                   EvKey KRight [] -> doMM dirForestCursorSelectNextChar
+                  EvKey KEnter [] -> doMM $ dirForestCursorCompleteToFile 0
+                  EvKey KEnter [MMeta] -> doMM dirForestCursorCompleteToDir
                   _ -> continue s
               Existent _ ->
                 case vtye of
