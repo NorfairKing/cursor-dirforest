@@ -9,12 +9,8 @@ where
 
 import Cursor.FileOrDir
 import Cursor.FileOrDir.Gen ()
-import Cursor.Simple.DirForest
-import qualified Data.DirForest as DF
 import Data.Word
-import Path
 import Test.Hspec
-import Test.Hspec.QuickCheck
 import Test.Validity
 
 spec :: Spec

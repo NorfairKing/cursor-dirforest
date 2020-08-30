@@ -8,6 +8,7 @@
 module Cursor.DirForest
   ( -- * Types
     DirForestCursor (..),
+    FileOrDirCursor (..),
     FileOrDir (..),
 
     -- * Construction and deconstruction

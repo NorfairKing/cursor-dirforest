@@ -11,7 +11,6 @@ import Brick.Types
 import Brick.Widgets.Core
 import Cursor.Brick.Forest
 import Cursor.DirForest
-import Cursor.FileOrDir
 import Cursor.Forest
 import Cursor.Tree
 

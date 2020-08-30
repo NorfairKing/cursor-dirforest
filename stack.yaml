@@ -5,7 +5,6 @@ packages:
 - cursor-dirforest-brick
 - cursor-dirforest-demo
 
-
 extra-deps:
 - github: NorfairKing/dirforest
   commit: c0657315e01683558a8f20b991bc47d4733ed40e

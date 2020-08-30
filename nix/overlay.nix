@@ -18,6 +18,10 @@ with final.haskell.lib;
         failOnAllWarnings (
           final.haskellPackages.callCabal2nix "cursor-dirforest-brick" (final.gitignoreSource ../cursor-dirforest-brick) {}
         );
+      cursor-dirforest-demo =
+        failOnAllWarnings (
+          final.haskellPackages.callCabal2nix "cursor-dirforest-demo" (final.gitignoreSource ../cursor-dirforest-demo) {}
+        );
     };
   haskellPackages =
     previous.haskellPackages.override (

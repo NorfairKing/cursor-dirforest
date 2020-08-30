@@ -5,7 +5,6 @@
 module Cursor.DirForest.Gen where
 
 import Cursor.DirForest
-import Cursor.FileOrDir
 import Cursor.FileOrDir.Gen ()
 import Cursor.Forest
 import Cursor.Forest.Gen ()

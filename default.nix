@@ -15,6 +15,6 @@ let
         };
     };
 in
-pkgs.dirforestPackages // {
+pkgs.cursorDirforestPackages // {
   pre-commit-check = check;
 }
