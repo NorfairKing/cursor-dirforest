@@ -11,11 +11,12 @@ import Brick.Types
 import Brick.Widgets.Core
 import Cursor.Brick.Forest
 import Cursor.DirForest
+import Cursor.FileOrDir
 import Cursor.Forest
 import Cursor.Tree
 
 verticalPaddedDirForestCursorWidget ::
-  (FileOrDir a -> Widget n) ->
+  (FileOrDirCursor a -> Widget n) ->
   (FileOrDir b -> Widget n) ->
   Int ->
   DirForestCursor a b ->
@@ -25,7 +26,7 @@ verticalPaddedDirForestCursorWidget goA goB padding =
 
 verticalDirForestCursorWidget ::
   (CTree (FileOrDir b) -> Widget n) ->
-  (TreeCursor (FileOrDir a) (FileOrDir b) -> Widget n) ->
+  (TreeCursor (FileOrDirCursor a) (FileOrDir b) -> Widget n) ->
   (CTree (FileOrDir b) -> Widget n) ->
   DirForestCursor a b ->
   Widget n
@@ -37,5 +38,12 @@ verticalDirForestCursorWidget beforeFunc currentFunc afterFunc = dirForestCursor
         map afterFunc afters
       ]
 
-dirForestCursorWidget :: ([CTree (FileOrDir b)] -> TreeCursor (FileOrDir a) (FileOrDir b) -> [CTree (FileOrDir b)] -> Widget n) -> DirForestCursor a b -> Widget n
+dirForestCursorWidget ::
+  ( [CTree (FileOrDir b)] ->
+    TreeCursor (FileOrDirCursor a) (FileOrDir b) ->
+    [CTree (FileOrDir b)] ->
+    Widget n
+  ) ->
+  DirForestCursor a b ->
+  Widget n
 dirForestCursorWidget = foldDirForestCursor

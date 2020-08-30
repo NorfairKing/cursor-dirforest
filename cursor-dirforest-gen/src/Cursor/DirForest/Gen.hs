@@ -44,14 +44,15 @@ instance (GenValid a, GenValid b) => GenValid (DirForestCursor a b) where
           FodFile _ _ -> pure EmptyCForest
           FodDir _ -> goCForest
         pure $ CNode fod cf
-      goTreeCursor :: Gen (TreeCursor (FileOrDir a) (FileOrDir b))
+      goTreeCursor :: Gen (TreeCursor (FileOrDirCursor a) (FileOrDir b))
       goTreeCursor = sized $ \s -> do
         (a, b, c) <- genSplit3 s
         treeAbove <- resize a goMAbove
         treeCurrent <- resize b genValid
         treeBelow <- resize c $ case treeCurrent of
-          FodFile _ _ -> pure EmptyCForest
-          FodDir _ -> goCForest
+          InProgress _ -> pure EmptyCForest
+          Existent (FodFile _ _) -> pure EmptyCForest
+          Existent (FodDir _) -> goCForest
         pure TreeCursor {..}
       goMAbove :: Gen (Maybe (TreeAbove (FileOrDir b)))
       goMAbove = oneof [pure Nothing, Just <$> goAbove]

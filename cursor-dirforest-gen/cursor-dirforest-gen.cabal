@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b7ddc81bc5224cc819796d88c71619a6c6430985c329a0fa0580eb6a2fafba59
+-- hash: 398e19546d48f8bbec5fc6ac538cbd512b21088cac6284af5b4aac2998f0da05
 
 name:           cursor-dirforest-gen
 version:        0.0.0.0
@@ -44,6 +44,7 @@ test-suite cursor-dirforest-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Cursor.FileOrDirSpec
       Cursor.Simple.DirForestSpec
       Paths_cursor_dirforest_gen
   hs-source-dirs:
@@ -52,6 +53,7 @@ test-suite cursor-dirforest-test
   build-depends:
       QuickCheck
     , base >=4.7 && <5
+    , cursor
     , cursor-dirforest
     , cursor-dirforest-gen
     , cursor-gen

@@ -13,6 +13,9 @@ module Cursor.Simple.DirForest
     rebuildDirForestCursor,
     DFC.isTopLevel,
 
+    -- *** Helper
+    dirForestCursorPrepareForMovement,
+
     -- ** Lenses
     DFC.dirForestCursorForestCursorL,
     DFC.dirForestCursorSelectedL,
@@ -42,6 +45,7 @@ module Cursor.Simple.DirForest
 
     -- * Edits
     dirForestCursorDeleteCurrent,
+    dirForestCursorStartNew,
 
     -- * Collapsing
 
@@ -57,6 +61,7 @@ module Cursor.Simple.DirForest
 where
 
 import qualified Cursor.DirForest as DFC
+import Cursor.Simple.Forest
 import Cursor.Types
 import Data.DirForest (DirForest (..))
 
@@ -68,53 +73,59 @@ type DirForestCursor a = DFC.DirForestCursor a a
 makeDirForestCursor :: DirForest a -> Maybe (DirForestCursor a)
 makeDirForestCursor = DFC.makeDirForestCursor id
 
-rebuildDirForestCursor :: DirForestCursor a -> DirForest a
-rebuildDirForestCursor = DFC.rebuildDirForestCursor id
+dirForestCursorPrepareForMovement :: DirForestCursor a -> DeleteOrUpdate (ForestCursor (DFC.FileOrDir a))
+dirForestCursorPrepareForMovement = DFC.dirForestCursorPrepareForMovement id id
 
-dirForestCursorSelectPrevOnSameLevel :: DirForestCursor a -> Maybe (DirForestCursor a)
+rebuildDirForestCursor :: DirForestCursor a -> DeleteOrUpdate (DirForest a)
+rebuildDirForestCursor = DFC.rebuildDirForestCursor id id
+
+dirForestCursorSelectPrevOnSameLevel :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))
 dirForestCursorSelectPrevOnSameLevel = DFC.dirForestCursorSelectPrevOnSameLevel id id
 
-dirForestCursorSelectNextOnSameLevel :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectNextOnSameLevel :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))
 dirForestCursorSelectNextOnSameLevel = DFC.dirForestCursorSelectNextOnSameLevel id id
 
-dirForestCursorSelectFirstOnSameLevel :: DirForestCursor a -> DirForestCursor a
+dirForestCursorSelectFirstOnSameLevel :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
 dirForestCursorSelectFirstOnSameLevel = DFC.dirForestCursorSelectFirstOnSameLevel id id
 
-dirForestCursorSelectLastOnSameLevel :: DirForestCursor a -> DirForestCursor a
+dirForestCursorSelectLastOnSameLevel :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
 dirForestCursorSelectLastOnSameLevel = DFC.dirForestCursorSelectLastOnSameLevel id id
 
-dirForestCursorSelectPrevTree :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectPrevTree :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))
 dirForestCursorSelectPrevTree = DFC.dirForestCursorSelectPrevTree id id
 
-dirForestCursorSelectNextTree :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectNextTree :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))
 dirForestCursorSelectNextTree = DFC.dirForestCursorSelectNextTree id id
 
-dirForestCursorSelectFirstTree :: DirForestCursor a -> DirForestCursor a
+dirForestCursorSelectFirstTree :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
 dirForestCursorSelectFirstTree = DFC.dirForestCursorSelectFirstTree id id
 
-dirForestCursorSelectLastTree :: DirForestCursor a -> DirForestCursor a
+dirForestCursorSelectLastTree :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
 dirForestCursorSelectLastTree = DFC.dirForestCursorSelectLastTree id id
 
-dirForestCursorSelectPrev :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectPrev :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))
 dirForestCursorSelectPrev = DFC.dirForestCursorSelectPrev id id
 
-dirForestCursorSelectNext :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectNext :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))
 dirForestCursorSelectNext = DFC.dirForestCursorSelectNext id id
 
-dirForestCursorSelectFirst :: DirForestCursor a -> DirForestCursor a
+dirForestCursorSelectFirst :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
 dirForestCursorSelectFirst = DFC.dirForestCursorSelectFirst id id
 
-dirForestCursorSelectLast :: DirForestCursor a -> DirForestCursor a
+dirForestCursorSelectLast :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
 dirForestCursorSelectLast = DFC.dirForestCursorSelectLast id id
 
-dirForestCursorSelectFirstChild :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectFirstChild :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))
 dirForestCursorSelectFirstChild = DFC.dirForestCursorSelectFirstChild id id
 
-dirForestCursorSelectLastChild :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectLastChild :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))
 dirForestCursorSelectLastChild = DFC.dirForestCursorSelectLastChild id id
 
-dirForestCursorSelectParent :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorSelectParent :: DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))
 dirForestCursorSelectParent = DFC.dirForestCursorSelectParent id id
 
 dirForestCursorDeleteCurrent :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
-dirForestCursorDeleteCurrent = DFC.dirForestCursorDeleteCurrent id
+dirForestCursorDeleteCurrent = DFC.dirForestCursorDeleteCurrent id id
+
+dirForestCursorStartNew :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorStartNew = DFC.dirForestCursorStartNew id

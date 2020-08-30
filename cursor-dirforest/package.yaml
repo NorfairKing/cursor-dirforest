@@ -17,5 +17,6 @@ library:
   - filepath
   - microlens
   - path
+  - text
   - validity
   - validity-path

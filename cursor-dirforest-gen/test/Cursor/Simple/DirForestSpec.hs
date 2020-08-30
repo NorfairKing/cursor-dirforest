@@ -10,11 +10,13 @@ where
 
 import Cursor.DirForest.Gen ()
 import Cursor.Simple.DirForest
+import Cursor.Types
 import qualified Data.DirForest as DF
 import Data.Word
 import Path
 import Test.Hspec
 import Test.Hspec.QuickCheck
+import Test.QuickCheck
 import Test.Validity
 
 spec :: Spec
@@ -37,9 +39,15 @@ spec = modifyMaxShrinks (const 0) $ do
       $ shouldBeValid
       $ makeDirForestCursor (DF.empty @Word8)
     it "produces valid cursors" $ producesValidsOnValids (makeDirForestCursor @Word8)
+  describe "dirForestCursorPrepareForMovement" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorPrepareForMovement @Word8)
   describe "rebuildDirForestCursor" $ do
     it "produces valid dirforests" $ producesValidsOnValids (rebuildDirForestCursor @Word8)
-    it "is the inverse of 'makeDirForestCursor'" $ inverseFunctionsIfFirstSucceedsOnValid (makeDirForestCursor @Word8) (rebuildDirForestCursor @Word8)
+    it "is the inverse of 'makeDirForestCursor'" $ forAllValid $ \df ->
+      case makeDirForestCursor @Word8 df of
+        Nothing -> pure ()
+        Just dfc -> case rebuildDirForestCursor dfc of
+          Updated df' -> df' `shouldBe` df
+          Deleted -> expectationFailure "Should rountrip"
   describe "dirForestCursorSelectPrevTree" $ forestMovementMSpec dirForestCursorSelectPrevTree
   describe "dirForestCursorSelectNextTree" $ forestMovementMSpec dirForestCursorSelectNextTree
   xdescribe "is not true because of subselections" $ describe "dirForestCursorSelectPrevTree and dirForestCursorSelectNextTree" $
@@ -64,40 +72,69 @@ spec = modifyMaxShrinks (const 0) $ do
   describe "dirForestCursorSelectLastChild" $ forestMovementMSpec dirForestCursorSelectLastChild
   describe "dirForestCursorSelectParent" $ do
     it "produces valid cursors" $ producesValidsOnValids (dirForestCursorSelectParent @Word8)
-    it "is the inverse of dirForestCursorSelectFirstChild" $ inverseFunctionsIfSucceedOnValid dirForestCursorSelectFirstChild (dirForestCursorSelectParent @Word8)
-    it "is the inverse of dirForestCursorSelectLastChild" $ inverseFunctionsIfSucceedOnValid dirForestCursorSelectLastChild (dirForestCursorSelectParent @Word8)
+    xdescribe "This does not hold, because in-progress file or directories will be deleted before moving" $ do
+      it "is the inverse of dirForestCursorSelectFirstChild" $
+        inverseMProp dirForestCursorSelectFirstChild dirForestCursorSelectParent
+      it "is the inverse of dirForestCursorSelectLastChild" $
+        inverseMProp dirForestCursorSelectLastChild dirForestCursorSelectParent
+  describe "dirForestCursorDeleteCurrent" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorDeleteCurrent @Word8)
+  describe "dirForestCursorStartNew" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStartNew @Word8)
 
 inverseMovementsSpec ::
-  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DirForestCursor a) ->
-  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DirForestCursor a) ->
+  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)) ->
+  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)) ->
   Spec
 inverseMovementsSpec f1 f2 = do
   it "are inverses starting with the First" $
-    inverseFunctionsOnValid (f1 @Word8) (f2 @Word8)
-  it "are inverses starting with the S       econd" $
-    inverseFunctionsOnValid (f1 @Word8) (f2 @Word8)
+    inverseProp f1 f2
+  it "are inverses starting with the Second" $
+    inverseProp f2 f1
+
+inverseProp ::
+  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)) ->
+  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)) ->
+  Property
+inverseProp f g = forAllValid $ \dfc -> case f @Word8 dfc of
+  Deleted -> pure () -- Fine
+  Updated dfc' -> case g @Word8 dfc' of
+    Deleted -> pure () -- Fine
+    Updated dfc'' -> dfc'' `shouldBe` dfc
 
 inverseMMovementsSpec ::
-  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> Maybe (DirForestCursor a)) ->
-  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> Maybe (DirForestCursor a)) ->
+  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))) ->
+  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))) ->
   Spec
 inverseMMovementsSpec f1 f2 = do
   it "are inverses starting with the First" $
-    inverseFunctionsIfSucceedOnValid (f1 @Word8) (f2 @Word8)
+    inverseMProp f1 f2
   it "are inverses starting with the Second" $
-    inverseFunctionsIfSucceedOnValid (f1 @Word8) (f2 @Word8)
+    inverseMProp f2 f1
 
-forestMovementMSpec :: (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> Maybe (DirForestCursor a)) -> Spec
+inverseMProp ::
+  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))) ->
+  (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))) ->
+  Property
+inverseMProp f g = forAllValid $ \dfc -> case f @Word8 dfc of
+  Deleted -> pure () -- Fine
+  Updated Nothing -> pure () -- Fine
+  Updated (Just dfc') -> case g @Word8 dfc' of
+    Deleted -> pure () -- Fine
+    Updated Nothing -> expectationFailure "The second movement must not be a failure."
+    Updated (Just dfc'') -> dfc'' `shouldBe` dfc
+
+forestMovementMSpec :: (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))) -> Spec
 forestMovementMSpec func = do
   it "produces valid results" $ producesValidsOnValids (func @Word8)
   it "is a movement" $ forAllValid $ \dfc ->
     case func @Word8 dfc of
-      Nothing -> pure () -- Fine
-      Just dfc' -> rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
+      Deleted -> pure () -- Fine
+      Updated Nothing -> pure () -- Fine
+      Updated (Just dfc') -> rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
 
-forestMovementSpec :: (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DirForestCursor a) -> Spec
+forestMovementSpec :: (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)) -> Spec
 forestMovementSpec func = do
   it "produces valid results" $ producesValidsOnValids (func @Word8)
   it "is a movement" $ forAllValid $ \dfc ->
-    let dfc' = func @Word8 dfc
-     in rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
+    case func @Word8 dfc of
+      Deleted -> pure () -- Fine
+      Updated dfc' -> rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc

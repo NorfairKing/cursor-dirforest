@@ -32,6 +32,7 @@ tests:
     - -Wall
     dependencies:
     - QuickCheck
+    - cursor
     - cursor-dirforest
     - cursor-dirforest-gen
     - cursor-gen

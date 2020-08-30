@@ -1,11 +1,13 @@
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE QuasiQuotes #-}
 
 module Cursor.FileOrDir where
 
 import Control.DeepSeq
 import Cursor.Text
+import qualified Data.Text as T
 import Data.Validity
 import Data.Validity.Path ()
 import GHC.Generics (Generic)
@@ -15,6 +17,24 @@ data FileOrDirCursor a
   = Existent (FileOrDir a)
   | InProgress TextCursor
   deriving (Show, Eq, Generic, Functor)
+
+instance Validity a => Validity (FileOrDirCursor a)
+
+instance NFData a => NFData (FileOrDirCursor a)
+
+makeFileOrDirCursor :: FileOrDir a -> FileOrDirCursor a
+makeFileOrDirCursor = Existent
+
+rebuildFileOrDirCursor :: FileOrDirCursor a -> Maybe (FileOrDir a)
+rebuildFileOrDirCursor = \case
+  Existent fod -> Just fod
+  InProgress _ -> Nothing
+
+completeTextCursorToFile :: TextCursor -> Maybe (Path Rel File)
+completeTextCursorToFile = parseRelFile . T.unpack . rebuildTextCursor
+
+completeTextCursorToDir :: TextCursor -> Maybe (Path Rel Dir)
+completeTextCursorToDir = parseRelDir . T.unpack . rebuildTextCursor
 
 data FileOrDir a = FodFile (Path Rel File) a | FodDir (Path Rel Dir)
   deriving (Show, Eq, Generic, Functor)

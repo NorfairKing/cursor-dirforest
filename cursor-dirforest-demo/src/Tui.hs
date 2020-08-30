@@ -9,8 +9,11 @@ import Brick.Main
 import Brick.Types
 import Brick.Util
 import Brick.Widgets.Core
+import Cursor.Brick.Text
 import Cursor.DirForest.Brick
+import Cursor.FileOrDir
 import Cursor.Simple.DirForest
+import Cursor.Types
 import qualified Data.DirForest as DF
 import Data.Int
 import Data.Maybe
@@ -32,7 +35,7 @@ newtype TuiState
   deriving (Show, Eq)
 
 data ResourceName
-  = ResourceName
+  = TheTextCursor
   deriving (Show, Eq, Ord)
 
 tuiApp :: App TuiState e ResourceName
@@ -69,35 +72,48 @@ buildInitialState = do
     pure size
   pure $ TuiState $ makeDirForestCursor df
 
-drawTui :: TuiState -> [Widget n]
+drawTui :: TuiState -> [Widget ResourceName]
 drawTui ts =
   let dfc = stateCursor ts
    in [maybe emptyWidget drawDirForestInt64Cursor dfc]
 
-drawDirForestInt64Cursor :: DirForestCursor Int64 -> Widget n
+drawDirForestInt64Cursor :: DirForestCursor Int64 -> Widget ResourceName
 drawDirForestInt64Cursor =
   verticalPaddedDirForestCursorWidget
-    (withDefAttr selectedAttr . goFod)
+    (withDefAttr selectedAttr . goFodC)
     goFod
     2
   where
-    goFod :: FileOrDir Int64 -> Widget n
+    goFodC :: FileOrDirCursor Int64 -> Widget ResourceName
+    goFodC = \case
+      Existent fod -> goFod fod
+      InProgress tc -> selectedTextCursorWidget TheTextCursor tc
+    goFod :: FileOrDir Int64 -> Widget ResourceName
     goFod = \case
       FodFile rf i -> withDefAttr fileAttr $ str $ fromRelFile rf <> " " <> show i <> " bytes"
       FodDir rd -> withDefAttr dirAttr $ str $ fromRelDir rd
 
-handleTuiEvent :: TuiState -> BrickEvent n e -> EventM n (Next TuiState)
+handleTuiEvent :: forall n e. TuiState -> BrickEvent n e -> EventM n (Next TuiState)
 handleTuiEvent s e =
   case e of
     VtyEvent vtye ->
-      let doP func =
+      let doP :: (DirForestCursor Int64 -> DeleteOrUpdate (DirForestCursor Int64)) -> EventM n (Next TuiState)
+          doP func =
             continue $
               s
                 { stateCursor = case stateCursor s of
                     Nothing -> Nothing
-                    Just dfc -> Just $ func dfc
+                    Just dfc -> case func dfc of
+                      Deleted -> Nothing
+                      Updated dfc' -> Just dfc'
                 }
-          doM func = doP (\c -> fromMaybe c $ func c)
+          doM :: (DirForestCursor Int64 -> DeleteOrUpdate (Maybe (DirForestCursor Int64))) -> EventM n (Next TuiState)
+          doM func = doP $ \c -> case func c of
+            Deleted -> Updated c
+            Updated Nothing -> Updated c
+            Updated (Just c') -> Updated c'
+          doMM :: (DirForestCursor Int64 -> Maybe (DirForestCursor Int64)) -> EventM n (Next TuiState)
+          doMM func = doP $ \c -> Updated $ fromMaybe c $ func c
        in case vtye of
             EvKey (KChar 'q') [] -> halt s
             EvKey (KChar 'f') [] -> doM dirForestCursorSelectFirstChild
@@ -111,6 +127,7 @@ handleTuiEvent s e =
             EvKey KRight [] -> doM dirForestCursorSelectLastChild
             EvKey KDown [] -> doM dirForestCursorSelectNext
             EvKey KUp [] -> doM dirForestCursorSelectPrev
-            EvKey (KChar '\t') [] -> doM dirForestCursorToggle
+            EvKey (KChar '\t') [] -> doMM dirForestCursorToggle
+            EvKey KEnter [] -> doMM dirForestCursorToggle
             _ -> continue s
     _ -> continue s
