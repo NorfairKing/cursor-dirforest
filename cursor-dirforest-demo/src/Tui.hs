@@ -133,8 +133,8 @@ handleTuiEvent s e =
                   EvKey KDel [] -> doD dirForestCursorDeleteChar
                   EvKey KLeft [] -> doMM dirForestCursorSelectPrevChar
                   EvKey KRight [] -> doMM dirForestCursorSelectNextChar
-                  EvKey KEnter [] -> doMM $ dirForestCursorCompleteToFile 0
-                  EvKey KEnter [MMeta] -> doMM dirForestCursorCompleteToDir
+                  EvKey KEnter [] -> doMM $ fmap snd <$> dirForestCursorCompleteToFile 0
+                  EvKey KEnter [MMeta] -> doMM $ fmap snd <$> dirForestCursorCompleteToDir
                   _ -> continue s
               Existent _ ->
                 case vtye of
@@ -147,6 +147,8 @@ handleTuiEvent s e =
                   EvKey (KChar 'G') [] -> doP dirForestCursorSelectLast
                   EvKey (KChar 'p') [] -> doM dirForestCursorSelectParent
                   EvKey (KChar 'n') [] -> doMM dirForestCursorStartNew
+                  EvKey (KChar 'N') [] -> doMM dirForestCursorStartNewBelowAtStart
+                  EvKey (KChar 'n') [MMeta] -> doMM dirForestCursorStartNewBelowAtEnd
                   EvKey (KChar 'd') [] -> doP dirForestCursorDeleteCurrent
                   EvKey KLeft [] -> doM dirForestCursorSelectParent
                   EvKey KRight [] -> doM dirForestCursorSelectLastChild

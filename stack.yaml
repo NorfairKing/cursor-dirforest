@@ -4,7 +4,6 @@ packages:
 - cursor-dirforest-gen
 - cursor-dirforest-brick
 - cursor-dirforest-demo
-
 extra-deps:
 - github: NorfairKing/dirforest
   commit: c0657315e01683558a8f20b991bc47d4733ed40e
@@ -16,7 +15,7 @@ extra-deps:
   subdirs:
   - cursor-brick
 - github: NorfairKing/cursor
-  commit: 6b8d2fab22cf380aaac5f6d0853ec8b3d4cdd0e1
+  commit: 043cab71318b752bde9dcb79db9ed60a58ecdccf
   subdirs:
   - cursor
   - cursor-gen

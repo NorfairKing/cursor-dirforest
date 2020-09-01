@@ -55,6 +55,8 @@ module Cursor.DirForest
     -- * Edits
     dirForestCursorDeleteCurrent,
     dirForestCursorStartNew,
+    dirForestCursorStartNewBelowAtStart,
+    dirForestCursorStartNewBelowAtEnd,
     dirForestCursorInsertChar,
     dirForestCursorAppendChar,
     dirForestCursorRemoveChar,
@@ -319,6 +321,32 @@ dirForestCursorStartNew f g dfc = case dfc ^. dirForestCursorSelectedL of
                 Existent
                 id
                 fc
+
+dirForestCursorStartNewBelowAtStart :: forall a b. (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorStartNewBelowAtStart f g dfc = case dfc ^. dirForestCursorSelectedL of
+  InProgress _ -> Nothing
+  Existent (FodFile _ _) -> Nothing
+  Existent (FodDir _) -> case dirForestCursorPrepareForMovement g dfc of
+    Deleted -> Nothing -- Should not happen
+    Updated fc ->
+      Just $ DirForestCursor $ forestCursorAddChildNodeSingleToNodeAtStartAndSelect (fmap f . fromJust . rebuildFileOrDirCursor) (InProgress emptyTextCursor) $
+        mapForestCursor
+          Existent
+          id
+          fc
+
+dirForestCursorStartNewBelowAtEnd :: forall a b. (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
+dirForestCursorStartNewBelowAtEnd f g dfc = case dfc ^. dirForestCursorSelectedL of
+  InProgress _ -> Nothing
+  Existent (FodFile _ _) -> Nothing
+  Existent (FodDir _) -> case dirForestCursorPrepareForMovement g dfc of
+    Deleted -> Nothing -- Should not happen
+    Updated fc ->
+      Just $ DirForestCursor $ forestCursorAddChildNodeSingleToNodeAtEndAndSelect (fmap f . fromJust . rebuildFileOrDirCursor) (InProgress emptyTextCursor) $
+        mapForestCursor
+          Existent
+          id
+          fc
 
 dirForestCursorInsertChar :: Char -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorInsertChar c = dirForestCursorSelectedL $ fileOrDirCursorInsertChar c

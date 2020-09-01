@@ -48,6 +48,8 @@ module Cursor.Simple.DirForest
     -- * Edits
     dirForestCursorDeleteCurrent,
     dirForestCursorStartNew,
+    dirForestCursorStartNewBelowAtStart,
+    dirForestCursorStartNewBelowAtEnd,
     DFC.dirForestCursorInsertChar,
     DFC.dirForestCursorAppendChar,
     DFC.dirForestCursorRemoveChar,
@@ -137,3 +139,9 @@ dirForestCursorDeleteCurrent = DFC.dirForestCursorDeleteCurrent id
 
 dirForestCursorStartNew :: DirForestCursor a -> Maybe (DirForestCursor a)
 dirForestCursorStartNew = DFC.dirForestCursorStartNew id id
+
+dirForestCursorStartNewBelowAtStart :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorStartNewBelowAtStart = DFC.dirForestCursorStartNewBelowAtStart id id
+
+dirForestCursorStartNewBelowAtEnd :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorStartNewBelowAtEnd = DFC.dirForestCursorStartNewBelowAtEnd id id
