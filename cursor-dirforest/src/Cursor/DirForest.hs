@@ -332,11 +332,17 @@ dirForestCursorRemoveChar = focusPossibleDeleteOrUpdate dirForestCursorSelectedL
 dirForestCursorDeleteChar :: DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
 dirForestCursorDeleteChar = focusPossibleDeleteOrUpdate dirForestCursorSelectedL fileOrDirCursorDeleteChar
 
-dirForestCursorCompleteToDir :: DirForestCursor a b -> Maybe (DirForestCursor a b)
-dirForestCursorCompleteToDir = dirForestCursorSelectedL fileOrDirCursorCompleteToDir
+dirForestCursorCompleteToDir :: DirForestCursor a b -> Maybe (Path Rel Dir, DirForestCursor a b)
+dirForestCursorCompleteToDir dfc = do
+  (rd, fodc) <- fileOrDirCursorCompleteToDir $ dfc ^. dirForestCursorSelectedL
+  let dfc' = dfc & dirForestCursorSelectedL .~ fodc
+  pure (rd, dfc')
 
-dirForestCursorCompleteToFile :: a -> DirForestCursor a b -> Maybe (DirForestCursor a b)
-dirForestCursorCompleteToFile a = dirForestCursorSelectedL $ fileOrDirCursorCompleteToFile a
+dirForestCursorCompleteToFile :: a -> DirForestCursor a b -> Maybe (Path Rel File, DirForestCursor a b)
+dirForestCursorCompleteToFile a dfc = do
+  (rf, fodc) <- fileOrDirCursorCompleteToFile a $ dfc ^. dirForestCursorSelectedL
+  let dfc' = dfc & dirForestCursorSelectedL .~ fodc
+  pure (rf, dfc')
 
 dirForestCursorOpen :: DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorOpen = dirForestCursorForestCursorL forestCursorOpenCurrentForest

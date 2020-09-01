@@ -61,27 +61,27 @@ fileOrDirCursorSelectNextChar = \case
   Existent _ -> Nothing
   InProgress tc -> InProgress <$> textCursorSelectNext tc
 
-fileOrDirCursorCompleteToDir :: FileOrDirCursor a -> Maybe (FileOrDirCursor a)
+fileOrDirCursorCompleteToDir :: FileOrDirCursor a -> Maybe (Path Rel Dir, FileOrDirCursor a)
 fileOrDirCursorCompleteToDir = \case
   Existent _ -> Nothing
   InProgress tc -> case completeTextCursorToDir tc of
     Nothing -> Nothing
     Just rd ->
       if isTopLevel rd
-        then Just $ Existent $ FodDir rd
+        then Just (rd, Existent $ FodDir rd)
         else Nothing
 
 completeTextCursorToDir :: TextCursor -> Maybe (Path Rel Dir)
 completeTextCursorToDir = parseRelDir . T.unpack . rebuildTextCursor
 
-fileOrDirCursorCompleteToFile :: a -> FileOrDirCursor a -> Maybe (FileOrDirCursor a)
+fileOrDirCursorCompleteToFile :: a -> FileOrDirCursor a -> Maybe (Path Rel File, FileOrDirCursor a)
 fileOrDirCursorCompleteToFile a = \case
   Existent _ -> Nothing
   InProgress tc -> case completeTextCursorToFile tc of
     Nothing -> Nothing
-    Just rd ->
-      if isTopLevel rd
-        then Just $ Existent $ FodFile rd a
+    Just rf ->
+      if isTopLevel rf
+        then Just (rf, Existent $ FodFile rf a)
         else Nothing
 
 completeTextCursorToFile :: TextCursor -> Maybe (Path Rel File)
