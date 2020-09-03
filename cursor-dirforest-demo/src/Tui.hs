@@ -122,7 +122,7 @@ handleTuiEvent s e =
           doMM func = doP $ \c -> Updated $ fromMaybe c $ func c
        in case stateCursor s of
             Nothing -> case vtye of
-              EvKey (KChar 'n') [] -> doMM dirForestCursorStartNew
+              EvKey (KChar 'n') [] -> doMM (dirForestCursorStartNew . Just)
               _ -> continue s
             Just dfc -> case dfc ^. dirForestCursorSelectedL of
               InProgress _ ->
@@ -146,7 +146,7 @@ handleTuiEvent s e =
                   EvKey (KChar 'g') [] -> doP dirForestCursorSelectFirst
                   EvKey (KChar 'G') [] -> doP dirForestCursorSelectLast
                   EvKey (KChar 'p') [] -> doM dirForestCursorSelectParent
-                  EvKey (KChar 'n') [] -> doMM dirForestCursorStartNew
+                  EvKey (KChar 'n') [] -> doMM (dirForestCursorStartNew . Just)
                   EvKey (KChar 'N') [] -> doMM dirForestCursorStartNewBelowAtStart
                   EvKey (KChar 'n') [MMeta] -> doMM dirForestCursorStartNewBelowAtEnd
                   EvKey (KChar 'd') [] -> doP dirForestCursorDeleteCurrent

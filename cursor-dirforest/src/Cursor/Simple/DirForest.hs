@@ -137,7 +137,7 @@ dirForestCursorSelectParent = DFC.dirForestCursorSelectParent id id
 dirForestCursorDeleteCurrent :: DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)
 dirForestCursorDeleteCurrent = DFC.dirForestCursorDeleteCurrent id
 
-dirForestCursorStartNew :: DirForestCursor a -> Maybe (DirForestCursor a)
+dirForestCursorStartNew :: Maybe (DirForestCursor a) -> Maybe (DirForestCursor a)
 dirForestCursorStartNew = DFC.dirForestCursorStartNew id id
 
 dirForestCursorStartNewBelowAtStart :: DirForestCursor a -> Maybe (DirForestCursor a)

@@ -307,20 +307,24 @@ dirForestCursorSelectNextChar = dirForestCursorSelectedL fileOrDirCursorSelectNe
 dirForestCursorDeleteCurrent :: (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForestCursor a b)
 dirForestCursorDeleteCurrent g = dirForestCursorForestCursorL $ forestCursorDeleteSubTree (fmap g . makeFileOrDirCursor)
 
-dirForestCursorStartNew :: forall a b. (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
-dirForestCursorStartNew f g dfc = case dfc ^. dirForestCursorSelectedL of
-  InProgress _ -> Nothing
-  Existent _ ->
-    let tc = singletonTreeCursor $ InProgress emptyTextCursor
-     in Just $ case dirForestCursorPrepareForMovement g dfc of
-          Deleted -> DirForestCursor $ ForestCursor $ singletonNonEmptyCursor tc
-          Updated fc ->
-            DirForestCursor
-              $ forestCursorInsertAndSelectTreeCursor (fmap f . fromJust . rebuildFileOrDirCursor) tc
-              $ mapForestCursor
-                Existent
-                id
-                fc
+dirForestCursorStartNew :: forall a b. (a -> b) -> (b -> a) -> Maybe (DirForestCursor a b) -> Maybe (DirForestCursor a b)
+dirForestCursorStartNew f g =
+  let tc = singletonTreeCursor $ InProgress emptyTextCursor
+      new = DirForestCursor $ ForestCursor $ singletonNonEmptyCursor tc
+   in \case
+        Nothing -> Just new
+        Just dfc -> case dfc ^. dirForestCursorSelectedL of
+          InProgress _ -> Nothing
+          Existent _ ->
+            Just $ case dirForestCursorPrepareForMovement g dfc of
+              Deleted -> new
+              Updated fc ->
+                DirForestCursor
+                  $ forestCursorInsertAndSelectTreeCursor (fmap f . fromJust . rebuildFileOrDirCursor) tc
+                  $ mapForestCursor
+                    Existent
+                    id
+                    fc
 
 dirForestCursorStartNewBelowAtStart :: forall a b. (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorStartNewBelowAtStart f g dfc = case dfc ^. dirForestCursorSelectedL of
