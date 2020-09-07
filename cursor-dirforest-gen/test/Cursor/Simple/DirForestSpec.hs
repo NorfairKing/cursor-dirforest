@@ -81,6 +81,7 @@ spec = modifyMaxShrinks (const 0) $ do
   describe "dirForestCursorStartNew" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStartNew @Word8)
   describe "dirForestCursorStartNewBelowAtStart" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStartNewBelowAtStart @Word8)
   describe "dirForestCursorStartNewBelowAtEnd" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStartNewBelowAtEnd @Word8)
+  describe "dirForestCursorStopNew" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStopNew @Word8)
   describe "dirForestCursorInsertChar" $ it "produces valid results" $ producesValidsOnValids2 (dirForestCursorInsertChar @Word8 @Word8)
   describe "dirForestCursorAppendChar" $ it "produces valid results" $ producesValidsOnValids2 (dirForestCursorAppendChar @Word8 @Word8)
   describe "dirForestCursorRemoveChar" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorRemoveChar @Word8 @Word8)

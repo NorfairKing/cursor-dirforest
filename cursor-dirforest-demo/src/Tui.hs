@@ -127,7 +127,7 @@ handleTuiEvent s e =
             Just dfc -> case dfc ^. dirForestCursorSelectedL of
               InProgress _ ->
                 case vtye of
-                  EvKey KEsc [] -> doP dirForestCursorDeleteCurrent
+                  EvKey KEsc [] -> doD dirForestCursorStopNew
                   EvKey (KChar c) [] -> doMM $ dirForestCursorInsertChar c
                   EvKey KBS [] -> doD dirForestCursorRemoveChar
                   EvKey KDel [] -> doD dirForestCursorDeleteChar

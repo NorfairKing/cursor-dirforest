@@ -57,6 +57,7 @@ module Cursor.DirForest
     dirForestCursorStartNew,
     dirForestCursorStartNewBelowAtStart,
     dirForestCursorStartNewBelowAtEnd,
+    dirForestCursorStopNew,
     dirForestCursorInsertChar,
     dirForestCursorAppendChar,
     dirForestCursorRemoveChar,
@@ -351,6 +352,11 @@ dirForestCursorStartNewBelowAtEnd f g dfc = case dfc ^. dirForestCursorSelectedL
           Existent
           id
           fc
+
+dirForestCursorStopNew :: (b -> a) -> DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
+dirForestCursorStopNew g dfc = case dfc ^. dirForestCursorSelectedL of
+  InProgress _ -> Just $ dirForestCursorDeleteCurrent g dfc
+  _ -> Nothing
 
 dirForestCursorInsertChar :: Char -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorInsertChar c = dirForestCursorSelectedL $ fileOrDirCursorInsertChar c
