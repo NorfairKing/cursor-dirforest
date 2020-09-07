@@ -309,8 +309,8 @@ dirForestCursorDeleteCurrent g = dirForestCursorForestCursorL $ forestCursorDele
 
 dirForestCursorStartNew :: forall a b. (a -> b) -> (b -> a) -> Maybe (DirForestCursor a b) -> Maybe (DirForestCursor a b)
 dirForestCursorStartNew f g =
-  let tc = singletonTreeCursor $ InProgress emptyTextCursor
-      new = DirForestCursor $ ForestCursor $ singletonNonEmptyCursor tc
+  let newNode = InProgress emptyTextCursor
+      new = DirForestCursor $ singletonForestCursor newNode
    in \case
         Nothing -> Just new
         Just dfc -> case dfc ^. dirForestCursorSelectedL of
@@ -320,7 +320,7 @@ dirForestCursorStartNew f g =
               Deleted -> new
               Updated fc ->
                 DirForestCursor
-                  $ forestCursorInsertAndSelectTreeCursor (fmap f . fromJust . rebuildFileOrDirCursor) tc
+                  $ forestCursorAppendNodeSingleAndSelect (fmap f . fromJust . rebuildFileOrDirCursor) newNode
                   $ mapForestCursor
                     Existent
                     id
