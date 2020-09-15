@@ -56,7 +56,9 @@ module Cursor.Simple.DirForest
     DFC.dirForestCursorRemoveChar,
     DFC.dirForestCursorDeleteChar,
     DFC.dirForestCursorCompleteToDir,
+    DFC.dirForestCursorCompleteToDir',
     DFC.dirForestCursorCompleteToFile,
+    DFC.dirForestCursorCompleteToFile',
 
     -- * Collapsing
 

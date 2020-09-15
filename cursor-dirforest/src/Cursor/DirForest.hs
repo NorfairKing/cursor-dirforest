@@ -63,7 +63,9 @@ module Cursor.DirForest
     dirForestCursorRemoveChar,
     dirForestCursorDeleteChar,
     dirForestCursorCompleteToDir,
+    dirForestCursorCompleteToDir',
     dirForestCursorCompleteToFile,
+    dirForestCursorCompleteToFile',
 
     -- * Collapsing
 
@@ -371,14 +373,20 @@ dirForestCursorDeleteChar :: DirForestCursor a b -> Maybe (DeleteOrUpdate (DirFo
 dirForestCursorDeleteChar = focusPossibleDeleteOrUpdate dirForestCursorSelectedL fileOrDirCursorDeleteChar
 
 dirForestCursorCompleteToDir :: DirForestCursor a b -> Maybe (Path Rel Dir, DirForestCursor a b)
-dirForestCursorCompleteToDir dfc = do
-  (rd, fodc) <- fileOrDirCursorCompleteToDir $ dfc ^. dirForestCursorSelectedL
+dirForestCursorCompleteToDir = dirForestCursorCompleteToDir' pure
+
+dirForestCursorCompleteToDir' :: (Path Rel Dir -> Maybe (Path Rel Dir)) -> DirForestCursor a b -> Maybe (Path Rel Dir, DirForestCursor a b)
+dirForestCursorCompleteToDir' func dfc = do
+  (rd, fodc) <- fileOrDirCursorCompleteToDir' func $ dfc ^. dirForestCursorSelectedL
   let dfc' = dfc & dirForestCursorSelectedL .~ fodc
   pure (rd, dfc')
 
 dirForestCursorCompleteToFile :: a -> DirForestCursor a b -> Maybe (Path Rel File, DirForestCursor a b)
-dirForestCursorCompleteToFile a dfc = do
-  (rf, fodc) <- fileOrDirCursorCompleteToFile a $ dfc ^. dirForestCursorSelectedL
+dirForestCursorCompleteToFile = dirForestCursorCompleteToFile' pure
+
+dirForestCursorCompleteToFile' :: (Path Rel File -> Maybe (Path Rel File)) -> a -> DirForestCursor a b -> Maybe (Path Rel File, DirForestCursor a b)
+dirForestCursorCompleteToFile' func a dfc = do
+  (rf, fodc) <- fileOrDirCursorCompleteToFile' func a $ dfc ^. dirForestCursorSelectedL
   let dfc' = dfc & dirForestCursorSelectedL .~ fodc
   pure (rf, dfc')
 
