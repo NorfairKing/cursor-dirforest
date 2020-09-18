@@ -80,6 +80,7 @@ module Cursor.DirForest
   )
 where
 
+import Control.Applicative
 import Control.DeepSeq
 import Cursor.FileOrDir
 import Cursor.Forest
@@ -366,11 +367,11 @@ dirForestCursorInsertChar c = dirForestCursorSelectedL $ fileOrDirCursorInsertCh
 dirForestCursorAppendChar :: Char -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorAppendChar c = dirForestCursorSelectedL $ fileOrDirCursorAppendChar c
 
-dirForestCursorRemoveChar :: DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
-dirForestCursorRemoveChar = focusPossibleDeleteOrUpdate dirForestCursorSelectedL fileOrDirCursorRemoveChar
+dirForestCursorRemoveChar :: (b -> a) -> DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
+dirForestCursorRemoveChar g dfc = Updated <$> dirForestCursorSelectedL (dullMDelete . fileOrDirCursorRemoveChar) dfc <|> dirForestCursorStopNew g dfc
 
-dirForestCursorDeleteChar :: DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
-dirForestCursorDeleteChar = focusPossibleDeleteOrUpdate dirForestCursorSelectedL fileOrDirCursorDeleteChar
+dirForestCursorDeleteChar :: (b -> a) -> DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
+dirForestCursorDeleteChar g dfc = Updated <$> dirForestCursorSelectedL (dullMDelete . fileOrDirCursorDeleteChar) dfc <|> dirForestCursorStopNew g dfc
 
 dirForestCursorCompleteToDir :: DirForestCursor a b -> Maybe (Path Rel Dir, DirForestCursor a b)
 dirForestCursorCompleteToDir = dirForestCursorCompleteToDir' pure

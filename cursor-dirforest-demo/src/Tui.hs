@@ -122,6 +122,7 @@ handleTuiEvent s e =
           doMM func = doP $ \c -> Updated $ fromMaybe c $ func c
        in case stateCursor s of
             Nothing -> case vtye of
+              EvKey (KChar 'q') [] -> halt s
               EvKey (KChar 'n') [] -> doMM (dirForestCursorStartNew . Just)
               _ -> continue s
             Just dfc -> case dfc ^. dirForestCursorSelectedL of
