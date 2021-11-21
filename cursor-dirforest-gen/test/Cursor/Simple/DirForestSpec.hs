@@ -35,35 +35,40 @@ spec = modifyMaxShrinks (const 0) $ do
   -- shrinkValidSpecWithLimit @(DirForestCursor Word8) 1
   -- xdescribe "Does not hold because of extra validity constraints" $ lensSpecOnValid (dirForestCursorMapCursorL @Word8)
   describe "makeDirForestCursor" $ do
-    it "works for an empty dirforest"
-      $ shouldBeValid
-      $ makeDirForestCursor (DF.empty @Word8)
-    it "produces valid cursors" $ producesValidsOnValids (makeDirForestCursor @Word8)
-  describe "dirForestCursorPrepareForMovement" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorPrepareForMovement @Word8)
+    it "works for an empty dirforest" $
+      shouldBeValid $
+        makeDirForestCursor (DF.empty @Word8)
+    it "produces valid cursors" $ producesValid (makeDirForestCursor @Word8)
+  describe "dirForestCursorPrepareForMovement" $ it "produces valid results" $ producesValid (dirForestCursorPrepareForMovement @Word8)
   describe "rebuildDirForestCursor" $ do
-    it "produces valid dirforests" $ producesValidsOnValids (rebuildDirForestCursor @Word8)
-    it "is the inverse of 'makeDirForestCursor'" $ forAllValid $ \df ->
-      case makeDirForestCursor @Word8 df of
-        Nothing -> pure ()
-        Just dfc -> case rebuildDirForestCursor dfc of
-          Updated df' -> df' `shouldBe` df
-          Deleted -> expectationFailure "Should rountrip"
+    it "produces valid dirforests" $ producesValid (rebuildDirForestCursor @Word8)
+    it "is the inverse of 'makeDirForestCursor'" $
+      forAllValid $ \df ->
+        case makeDirForestCursor @Word8 df of
+          Nothing -> pure ()
+          Just dfc -> case rebuildDirForestCursor dfc of
+            Updated df' -> df' `shouldBe` df
+            Deleted -> expectationFailure "Should rountrip"
   describe "dirForestCursorSelectPrevTree" $ forestMovementMSpec dirForestCursorSelectPrevTree
   describe "dirForestCursorSelectNextTree" $ forestMovementMSpec dirForestCursorSelectNextTree
-  xdescribe "is not true because of subselections" $ describe "dirForestCursorSelectPrevTree and dirForestCursorSelectNextTree" $
-    inverseMMovementsSpec dirForestCursorSelectPrevTree dirForestCursorSelectNextTree
+  xdescribe "is not true because of subselections" $
+    describe "dirForestCursorSelectPrevTree and dirForestCursorSelectNextTree" $
+      inverseMMovementsSpec dirForestCursorSelectPrevTree dirForestCursorSelectNextTree
   describe "dirForestCursorSelectFirstTree" $ forestMovementSpec dirForestCursorSelectFirstTree
   describe "dirForestCursorSelectLastTree" $ forestMovementSpec dirForestCursorSelectLastTree
-  xdescribe "is not true because of subselections" $ describe "dirForestCursorSelectFirstTree and dirForestCursorSelectLastTree" $
-    inverseMovementsSpec dirForestCursorSelectFirstTree dirForestCursorSelectLastTree
+  xdescribe "is not true because of subselections" $
+    describe "dirForestCursorSelectFirstTree and dirForestCursorSelectLastTree" $
+      inverseMovementsSpec dirForestCursorSelectFirstTree dirForestCursorSelectLastTree
   describe "dirForestCursorSelectPrevOnSameLevel" $ forestMovementMSpec dirForestCursorSelectPrevOnSameLevel
   describe "dirForestCursorSelectNextOnSameLevel" $ forestMovementMSpec dirForestCursorSelectNextOnSameLevel
-  xdescribe "is not true because of ordering of files in the map" $ describe "dirForestCursorSelectPrevOnSameLevel and dirForestCursorSelectNextOnSameLevel" $
-    inverseMMovementsSpec dirForestCursorSelectPrevOnSameLevel dirForestCursorSelectNextOnSameLevel
+  xdescribe "is not true because of ordering of files in the map" $
+    describe "dirForestCursorSelectPrevOnSameLevel and dirForestCursorSelectNextOnSameLevel" $
+      inverseMMovementsSpec dirForestCursorSelectPrevOnSameLevel dirForestCursorSelectNextOnSameLevel
   describe "dirForestCursorSelectFirstOnSameLevel" $ forestMovementSpec dirForestCursorSelectFirstOnSameLevel
   describe "dirForestCursorSelectLastOnSameLevel" $ forestMovementSpec dirForestCursorSelectLastOnSameLevel
-  xdescribe "is not true because of ordering of files in the map" $ describe "dirForestCursorSelectFirstOnSameLevel and dirForestCursorSelectLastOnSameLevel" $
-    inverseMovementsSpec dirForestCursorSelectFirstOnSameLevel dirForestCursorSelectLastOnSameLevel
+  xdescribe "is not true because of ordering of files in the map" $
+    describe "dirForestCursorSelectFirstOnSameLevel and dirForestCursorSelectLastOnSameLevel" $
+      inverseMovementsSpec dirForestCursorSelectFirstOnSameLevel dirForestCursorSelectLastOnSameLevel
   describe "dirForestCursorSelectPrev" $ forestMovementMSpec dirForestCursorSelectPrev
   describe "dirForestCursorSelectNext" $ forestMovementMSpec dirForestCursorSelectNext
   describe "dirForestCursorSelectFirst" $ forestMovementSpec dirForestCursorSelectFirst
@@ -71,25 +76,25 @@ spec = modifyMaxShrinks (const 0) $ do
   describe "dirForestCursorSelectFirstChild" $ forestMovementMSpec dirForestCursorSelectFirstChild
   describe "dirForestCursorSelectLastChild" $ forestMovementMSpec dirForestCursorSelectLastChild
   describe "dirForestCursorSelectParent" $ do
-    it "produces valid cursors" $ producesValidsOnValids (dirForestCursorSelectParent @Word8)
+    it "produces valid cursors" $ producesValid (dirForestCursorSelectParent @Word8)
     xdescribe "This does not hold, because in-progress file or directories will be deleted before moving" $ do
       it "is the inverse of dirForestCursorSelectFirstChild" $
         inverseMProp dirForestCursorSelectFirstChild dirForestCursorSelectParent
       it "is the inverse of dirForestCursorSelectLastChild" $
         inverseMProp dirForestCursorSelectLastChild dirForestCursorSelectParent
-  describe "dirForestCursorDeleteCurrent" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorDeleteCurrent @Word8)
-  describe "dirForestCursorStartNew" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStartNew @Word8)
-  describe "dirForestCursorStartNewBelowAtStart" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStartNewBelowAtStart @Word8)
-  describe "dirForestCursorStartNewBelowAtEnd" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStartNewBelowAtEnd @Word8)
-  describe "dirForestCursorStopNew" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorStopNew @Word8)
-  describe "dirForestCursorInsertChar" $ it "produces valid results" $ producesValidsOnValids2 (dirForestCursorInsertChar @Word8 @Word8)
-  describe "dirForestCursorAppendChar" $ it "produces valid results" $ producesValidsOnValids2 (dirForestCursorAppendChar @Word8 @Word8)
-  describe "dirForestCursorRemoveChar" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorRemoveChar @Word8)
-  describe "dirForestCursorDeleteChar" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorDeleteChar @Word8)
-  describe "dirForestCursorSelectPrevChar" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorSelectPrevChar @Word8 @Word8)
-  describe "dirForestCursorSelectNextChar" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorSelectNextChar @Word8 @Word8)
-  describe "dirForestCursorCompleteToDir" $ it "produces valid results" $ producesValidsOnValids (dirForestCursorCompleteToDir @Word8 @Word8)
-  describe "dirForestCursorCompleteToFile" $ it "produces valid results" $ producesValidsOnValids2 (dirForestCursorCompleteToFile @Word8 @Word8)
+  describe "dirForestCursorDeleteCurrent" $ it "produces valid results" $ producesValid (dirForestCursorDeleteCurrent @Word8)
+  describe "dirForestCursorStartNew" $ it "produces valid results" $ producesValid (dirForestCursorStartNew @Word8)
+  describe "dirForestCursorStartNewBelowAtStart" $ it "produces valid results" $ producesValid (dirForestCursorStartNewBelowAtStart @Word8)
+  describe "dirForestCursorStartNewBelowAtEnd" $ it "produces valid results" $ producesValid (dirForestCursorStartNewBelowAtEnd @Word8)
+  describe "dirForestCursorStopNew" $ it "produces valid results" $ producesValid (dirForestCursorStopNew @Word8)
+  describe "dirForestCursorInsertChar" $ it "produces valid results" $ producesValid2 (dirForestCursorInsertChar @Word8 @Word8)
+  describe "dirForestCursorAppendChar" $ it "produces valid results" $ producesValid2 (dirForestCursorAppendChar @Word8 @Word8)
+  describe "dirForestCursorRemoveChar" $ it "produces valid results" $ producesValid (dirForestCursorRemoveChar @Word8)
+  describe "dirForestCursorDeleteChar" $ it "produces valid results" $ producesValid (dirForestCursorDeleteChar @Word8)
+  describe "dirForestCursorSelectPrevChar" $ it "produces valid results" $ producesValid (dirForestCursorSelectPrevChar @Word8 @Word8)
+  describe "dirForestCursorSelectNextChar" $ it "produces valid results" $ producesValid (dirForestCursorSelectNextChar @Word8 @Word8)
+  describe "dirForestCursorCompleteToDir" $ it "produces valid results" $ producesValid (dirForestCursorCompleteToDir @Word8 @Word8)
+  describe "dirForestCursorCompleteToFile" $ it "produces valid results" $ producesValid2 (dirForestCursorCompleteToFile @Word8 @Word8)
 
 inverseMovementsSpec ::
   (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)) ->
@@ -135,17 +140,19 @@ inverseMProp f g = forAllValid $ \dfc -> case f @Word8 dfc of
 
 forestMovementMSpec :: (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (Maybe (DirForestCursor a))) -> Spec
 forestMovementMSpec func = do
-  it "produces valid results" $ producesValidsOnValids (func @Word8)
-  it "is a movement" $ forAllValid $ \dfc ->
-    case func @Word8 dfc of
-      Deleted -> pure () -- Fine
-      Updated Nothing -> pure () -- Fine
-      Updated (Just dfc') -> rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
+  it "produces valid results" $ producesValid (func @Word8)
+  it "is a movement" $
+    forAllValid $ \dfc ->
+      case func @Word8 dfc of
+        Deleted -> pure () -- Fine
+        Updated Nothing -> pure () -- Fine
+        Updated (Just dfc') -> rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
 
 forestMovementSpec :: (forall a. (Show a, Eq a, GenValid a) => DirForestCursor a -> DeleteOrUpdate (DirForestCursor a)) -> Spec
 forestMovementSpec func = do
-  it "produces valid results" $ producesValidsOnValids (func @Word8)
-  it "is a movement" $ forAllValid $ \dfc ->
-    case func @Word8 dfc of
-      Deleted -> pure () -- Fine
-      Updated dfc' -> rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc
+  it "produces valid results" $ producesValid (func @Word8)
+  it "is a movement" $
+    forAllValid $ \dfc ->
+      case func @Word8 dfc of
+        Deleted -> pure () -- Fine
+        Updated dfc' -> rebuildDirForestCursor dfc' `shouldBe` rebuildDirForestCursor dfc

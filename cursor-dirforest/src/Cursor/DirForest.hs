@@ -210,12 +210,12 @@ makeDirForestCursor func = fmap (DirForestCursor . makeForestCursor (fmap func .
 
 dirForestCursorPrepareForMovement :: (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (ForestCursor (FileOrDir a) (FileOrDir b))
 dirForestCursorPrepareForMovement g dfc =
-  fmap (mapForestCursor (fromJust . rebuildFileOrDirCursor) id)
-    $ ( case dfc ^. dirForestCursorSelectedL of
-          InProgress _ -> forestCursorRemoveElem (fmap g . makeFileOrDirCursor)
-          Existent _ -> Updated
-      )
-    $ dirForestCursorForestCursor dfc
+  fmap (mapForestCursor (fromJust . rebuildFileOrDirCursor) id) $
+    ( case dfc ^. dirForestCursorSelectedL of
+        InProgress _ -> forestCursorRemoveElem (fmap g . makeFileOrDirCursor)
+        Existent _ -> Updated
+    )
+      $ dirForestCursorForestCursor dfc
 
 rebuildDirForestCursor :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForest b)
 rebuildDirForestCursor f g = fmap (fromForest . NE.toList . NE.map rebuildCTree . rebuildForestCursor (fmap f)) . dirForestCursorPrepareForMovement g
@@ -323,12 +323,12 @@ dirForestCursorStartNew f g =
             Just $ case dirForestCursorPrepareForMovement g dfc of
               Deleted -> new
               Updated fc ->
-                DirForestCursor
-                  $ forestCursorAppendNodeSingleAndSelect (fmap f . fromJust . rebuildFileOrDirCursor) newNode
-                  $ mapForestCursor
-                    Existent
-                    id
-                    fc
+                DirForestCursor $
+                  forestCursorAppendNodeSingleAndSelect (fmap f . fromJust . rebuildFileOrDirCursor) newNode $
+                    mapForestCursor
+                      Existent
+                      id
+                      fc
 
 dirForestCursorStartNewBelowAtStart :: forall a b. (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorStartNewBelowAtStart f g dfc = case dfc ^. dirForestCursorSelectedL of
@@ -337,11 +337,13 @@ dirForestCursorStartNewBelowAtStart f g dfc = case dfc ^. dirForestCursorSelecte
   Existent (FodDir _) -> case dirForestCursorPrepareForMovement g dfc of
     Deleted -> Nothing -- Should not happen
     Updated fc ->
-      Just $ DirForestCursor $ forestCursorAddChildNodeSingleToNodeAtStartAndSelect (fmap f . fromJust . rebuildFileOrDirCursor) (InProgress emptyTextCursor) $
-        mapForestCursor
-          Existent
-          id
-          fc
+      Just $
+        DirForestCursor $
+          forestCursorAddChildNodeSingleToNodeAtStartAndSelect (fmap f . fromJust . rebuildFileOrDirCursor) (InProgress emptyTextCursor) $
+            mapForestCursor
+              Existent
+              id
+              fc
 
 dirForestCursorStartNewBelowAtEnd :: forall a b. (a -> b) -> (b -> a) -> DirForestCursor a b -> Maybe (DirForestCursor a b)
 dirForestCursorStartNewBelowAtEnd f g dfc = case dfc ^. dirForestCursorSelectedL of
@@ -350,11 +352,13 @@ dirForestCursorStartNewBelowAtEnd f g dfc = case dfc ^. dirForestCursorSelectedL
   Existent (FodDir _) -> case dirForestCursorPrepareForMovement g dfc of
     Deleted -> Nothing -- Should not happen
     Updated fc ->
-      Just $ DirForestCursor $ forestCursorAddChildNodeSingleToNodeAtEndAndSelect (fmap f . fromJust . rebuildFileOrDirCursor) (InProgress emptyTextCursor) $
-        mapForestCursor
-          Existent
-          id
-          fc
+      Just $
+        DirForestCursor $
+          forestCursorAddChildNodeSingleToNodeAtEndAndSelect (fmap f . fromJust . rebuildFileOrDirCursor) (InProgress emptyTextCursor) $
+            mapForestCursor
+              Existent
+              id
+              fc
 
 dirForestCursorStopNew :: (b -> a) -> DirForestCursor a b -> Maybe (DeleteOrUpdate (DirForestCursor a b))
 dirForestCursorStopNew g dfc = case dfc ^. dirForestCursorSelectedL of

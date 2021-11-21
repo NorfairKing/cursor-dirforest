@@ -1,4 +1,4 @@
-resolver: lts-14.23
+resolver: lts-16.12
 packages:
 - cursor-dirforest
 - cursor-dirforest-gen
@@ -6,21 +6,21 @@ packages:
 - cursor-dirforest-demo
 extra-deps:
 - github: NorfairKing/dirforest
-  commit: c0657315e01683558a8f20b991bc47d4733ed40e
+  commit: 69e8ae036b047fae105c1fe990e175a7572a3eba
   subdirs:
   - dirforest
   - genvalidity-dirforest
 - github: NorfairKing/cursor-brick
-  commit: 58b2c811c721885eaa3c066b41bc4d4883e4566c
+  commit: 5c1d1306632403a3dc11ddeda10deee932c0b307
   subdirs:
   - cursor-brick
 - github: NorfairKing/cursor
-  commit: f0a17f78d619c34280e326ca6968cda4438c6d75
+  commit: ff27e78281430c298a25a7805c9c61ca1e69f4c5
   subdirs:
   - cursor
   - cursor-gen
 - github: NorfairKing/validity
-  commit: b8c4cb4cafef7eb2feabaf767eb0d96c5fb5b573
+  commit: 35bc8d45b27e6c21429e4b681b16e46ccd541b3b
   subdirs:
   - genvalidity
   - genvalidity-aeson
@@ -55,9 +55,5 @@ extra-deps:
   - validity-uuid
   - validity-vector
 nix:
-  path: [ "nixpkgs=https://github.com/NixOS/nixpkgs/archive/323fe92057bb38475a446ff5e18d3b388c2e4403.tar.gz"]
-  add-gc-roots: true
-  pure: true
-  packages:
-  - zlib
+  shell-file: shell.nix
 

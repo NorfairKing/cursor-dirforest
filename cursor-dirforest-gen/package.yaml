@@ -16,7 +16,7 @@ library:
   - cursor-gen
   - dirforest
   - filepath
-  - genvalidity
+  - genvalidity >=1.0.0.0
   - genvalidity-containers
   - genvalidity-dirforest
   - path

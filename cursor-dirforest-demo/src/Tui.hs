@@ -31,8 +31,7 @@ cursorDirForestDemo = do
   endState <- defaultMain tuiApp initialState
   pPrint endState
 
-newtype TuiState
-  = TuiState {stateCursor :: Maybe (DirForestCursor Int64)}
+newtype TuiState = TuiState {stateCursor :: Maybe (DirForestCursor Int64)}
   deriving (Show, Eq)
 
 data ResourceName

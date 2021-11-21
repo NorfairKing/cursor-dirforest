@@ -1,44 +1,16 @@
+{ sources ? import ./sources.nix
+}:
 let
-  pkgsv = import (import ./nixpkgs.nix);
-  pkgs = pkgsv {};
-  validity-overlay =
-    import (
-      (
-        pkgs.fetchFromGitHub (import ./validity-version.nix)
-        + "/nix/overlay.nix"
-      )
-    );
-  cursor-overlay =
-    import (
-      (
-        pkgs.fetchFromGitHub (import ./cursor-version.nix)
-        + "/nix/overlay.nix"
-      )
-    );
-  dirforest-overlay =
-    import (
-      (
-        pkgs.fetchFromGitHub (import ./dirforest-version.nix)
-        + "/nix/overlay.nix"
-      )
-    );
-  cursor-brick-overlay =
-    import (
-      (
-        pkgs.fetchFromGitHub (import ./cursor-brick-version.nix)
-        + "/nix/overlay.nix"
-      )
-    );
+  pkgsv = import sources.nixpkgs;
 in
-pkgsv {
-  overlays =
-    [
-      validity-overlay
-      cursor-overlay
-      dirforest-overlay
-      cursor-brick-overlay
-      (import ./overlay.nix)
-      (import ./gitignore-src.nix)
-
-    ];
+import sources.nixpkgs {
+  overlays = [
+    (import (sources.validity + "/nix/overlay.nix"))
+    (import (sources.dirforest + "/nix/overlay.nix"))
+    (import (sources.cursor + "/nix/overlay.nix"))
+    (import (sources.cursor-brick + "/nix/overlay.nix"))
+    (final: previous: { inherit (import sources.gitignore { inherit (final) lib; }) gitignoreSource; })
+    (import ./overlay.nix)
+  ];
+  config.allowUnfree = true;
 }
