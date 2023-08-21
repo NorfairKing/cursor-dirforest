@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 398e19546d48f8bbec5fc6ac538cbd512b21088cac6284af5b4aac2998f0da05
+-- hash: 9f87c44f51442c6b65631ca9ee453dd61be21517a06188a35f5c83e92ff9649d
 
 name:           cursor-dirforest-gen
 version:        0.0.0.0
@@ -34,7 +34,7 @@ library
     , cursor-gen
     , dirforest
     , filepath
-    , genvalidity
+    , genvalidity >=1.0.0.0
     , genvalidity-containers
     , genvalidity-dirforest
     , path

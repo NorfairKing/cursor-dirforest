@@ -210,12 +210,12 @@ makeDirForestCursor func = fmap (DirForestCursor . makeForestCursor (fmap func .
 
 dirForestCursorPrepareForMovement :: (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (ForestCursor (FileOrDir a) (FileOrDir b))
 dirForestCursorPrepareForMovement g dfc =
-  fmap (mapForestCursor (fromJust . rebuildFileOrDirCursor) id) $
-    ( case dfc ^. dirForestCursorSelectedL of
-        InProgress _ -> forestCursorRemoveElem (fmap g . makeFileOrDirCursor)
-        Existent _ -> Updated
-    )
-      $ dirForestCursorForestCursor dfc
+  fmap (mapForestCursor (fromJust . rebuildFileOrDirCursor) id)
+    $ ( case dfc ^. dirForestCursorSelectedL of
+          InProgress _ -> forestCursorRemoveElem (fmap g . makeFileOrDirCursor)
+          Existent _ -> Updated
+      )
+    $ dirForestCursorForestCursor dfc
 
 rebuildDirForestCursor :: (a -> b) -> (b -> a) -> DirForestCursor a b -> DeleteOrUpdate (DirForest b)
 rebuildDirForestCursor f g = fmap (fromForest . NE.toList . NE.map rebuildCTree . rebuildForestCursor (fmap f)) . dirForestCursorPrepareForMovement g
