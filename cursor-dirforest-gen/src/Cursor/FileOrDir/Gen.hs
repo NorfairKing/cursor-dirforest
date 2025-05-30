@@ -11,11 +11,11 @@ import Data.GenValidity.Containers ()
 import Data.GenValidity.DirForest ()
 import Test.QuickCheck
 
-instance GenValid a => GenValid (FileOrDirCursor a) where
+instance (GenValid a) => GenValid (FileOrDirCursor a) where
   shrinkValid = shrinkValidStructurallyWithoutExtraFiltering
   genValid = genValidStructurallyWithoutExtraChecking
 
-instance GenValid a => GenValid (FileOrDir a) where
+instance (GenValid a) => GenValid (FileOrDir a) where
   shrinkValid = shrinkValidStructurally
   genValid =
     oneof

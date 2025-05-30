@@ -19,9 +19,9 @@ data FileOrDirCursor a
   | InProgress TextCursor
   deriving (Show, Eq, Generic, Functor)
 
-instance Validity a => Validity (FileOrDirCursor a)
+instance (Validity a) => Validity (FileOrDirCursor a)
 
-instance NFData a => NFData (FileOrDirCursor a)
+instance (NFData a) => NFData (FileOrDirCursor a)
 
 makeFileOrDirCursor :: FileOrDir a -> FileOrDirCursor a
 makeFileOrDirCursor = Existent
@@ -113,7 +113,7 @@ instance (Validity a) => Validity (FileOrDir a) where
           FodDir rd -> isTopLevel rd
       ]
 
-instance NFData a => NFData (FileOrDir a)
+instance (NFData a) => NFData (FileOrDir a)
 
 isTopLevel :: Path Rel t -> Bool
 isTopLevel p_ = parent p_ == [reldir|./|]

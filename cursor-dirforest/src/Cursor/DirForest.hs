@@ -246,7 +246,7 @@ dirForestCursorSelected dfc =
         FodDir rp -> goMAbove (rp </> d, fod) (treeAboveAbove ta)
    in goMAbove ([reldir|./|], treeCurrent tc) (treeAbove tc)
 
-doMovementF :: forall a b f. Functor f => (b -> a) -> (ForestCursor (FileOrDir a) (FileOrDir b) -> f (ForestCursor (FileOrDir a) (FileOrDir b))) -> DirForestCursor a b -> DeleteOrUpdate (f (DirForestCursor a b))
+doMovementF :: forall a b f. (Functor f) => (b -> a) -> (ForestCursor (FileOrDir a) (FileOrDir b) -> f (ForestCursor (FileOrDir a) (FileOrDir b))) -> DirForestCursor a b -> DeleteOrUpdate (f (DirForestCursor a b))
 doMovementF g movementFunc =
   fmap
     ( fmap (DirForestCursor . mapForestCursor makeFileOrDirCursor id)
